@@ -30,7 +30,7 @@ if BASE_DIR not in sys.path:
     sys.path.insert(0, BASE_DIR)
 
 DUCKDB_PATH = os.path.join(BASE_DIR, "data/warehouse/propiq_warehouse.duckdb")
-OLTP_DB_PATH = os.path.join(BASE_DIR, "data/raw/propiq_raw_oltp.db")
+POSTGRES_URL = "postgresql://postgres:postgrespassword@localhost:5432/propiq_db"
 DOCS_DIR = os.path.join(BASE_DIR, "data/raw/scraped_text")
 METRICS_PATH = os.path.join(BASE_DIR, "artifacts/ml/model_comparison_metrics.json")
 AUDIT_PATH = os.path.join(BASE_DIR, "data/staging/deduplication_audit.csv")
@@ -277,19 +277,21 @@ def get_live_pipeline_metrics(selected_city: str = "All Metros"):
     raw_count = 1850
     dups_count = 256
     
-    # 1. Read live listings ingested from SQLite OLTP raw table
-    if os.path.exists(OLTP_DB_PATH):
-        try:
-            import sqlite3
-            conn = sqlite3.connect(OLTP_DB_PATH)
+    # 1. Read live listings ingested from PostgreSQL OLTP raw table via SQLAlchemy
+    try:
+        from sqlalchemy import create_engine, text
+        engine = create_engine(POSTGRES_URL)
+        with engine.connect() as conn:
             if selected_city != "All Metros":
-                cur = conn.execute("SELECT COUNT(*) FROM raw_property_listings WHERE city = ?", (selected_city,))
+                stmt = text("SELECT COUNT(*) FROM raw_property_listings WHERE city = :city")
+                val = conn.execute(stmt, {"city": selected_city}).scalar()
             else:
-                cur = conn.execute("SELECT COUNT(*) FROM raw_property_listings")
-            raw_count = cur.fetchone()[0]
-            conn.close()
-        except Exception:
-            pass
+                stmt = text("SELECT COUNT(*) FROM raw_property_listings")
+                val = conn.execute(stmt).scalar()
+            if val is not None:
+                raw_count = int(val)
+    except Exception:
+        pass
 
     # 2. Read live duplicates removed from deduplication audit
     if os.path.exists(AUDIT_PATH):
@@ -511,7 +513,7 @@ if nav_selection == "Overview":
         st.markdown("""
         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; border-top: 1px solid #282A2F; padding-top: 12px;">
             <div style="display: flex; gap: 8px; align-items: center;">
-                <span style="font-size: 0.72rem; background: #27292E; color: #8E929A; padding: 5px 12px; border-radius: 12px; font-weight: 600;">OLTP: SQLite</span>
+                <span style="font-size: 0.72rem; background: #27292E; color: #38BDF8; padding: 5px 12px; border-radius: 12px; font-weight: 600;">OLTP: PostgreSQL</span>
                 <span style="font-size: 0.72rem; background: #27292E; color: #B4F73E; padding: 5px 12px; border-radius: 12px; font-weight: 600;">OLAP: DuckDB</span>
             </div>
             <div class="round-action-btn">+</div>

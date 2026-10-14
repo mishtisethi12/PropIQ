@@ -6,3 +6,6 @@ __pycache__/
 *.log
 venv/
 .env
+pgsql/
+scripts/*.zip
+scripts/pg_password.txt

@@ -8,7 +8,7 @@ storage:
   staging_dir: "data/staging"
   warehouse_dir: "data/warehouse"
   duckdb_path: "data/warehouse/propiq_warehouse.duckdb"
-  postgres_url: "postgresql://postgres:postgres@localhost:5432/propiq_db"
+  postgres_url: "postgresql+psycopg2://postgres:postgrespassword@localhost:5432/propiq_db"
   sqlite_raw_path: "data/raw/propiq_raw_oltp.db"
 
 ingestion:

@@ -1,16 +1,22 @@
 """
-PropIQ - Ingestion Pipeline Runner
+PropIQ - Ingestion Pipeline Runner (PostgreSQL OLTP Layer)
 Orchestrates multi-source ingestion:
 1. Portal Alpha & Beta CSVs
 2. Locality Metadata Public API
 3. Scraped Unstructured Texts & Lease Documents
-Persists raw tables to OLTP storage (SQLite/PostgreSQL) and staging parquet.
+Persists raw tables directly into PostgreSQL using SQLAlchemy.
 """
 
 import os
+import sys
 import yaml
-import sqlite3
 import pandas as pd
+
+base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+if base_dir not in sys.path:
+    sys.path.insert(0, base_dir)
+
+from sqlalchemy import create_engine, text
 from src.ingestion.csv_ingestion import CSVIngestionEngine
 from src.ingestion.api_ingestion import APIIngestionEngine
 from src.ingestion.scraper_ingestion import ScraperIngestionEngine
@@ -25,13 +31,12 @@ def run_ingestion(config_path: str = "config/config.yaml") -> dict:
     beta_csv = os.path.join(base_dir, cfg["ingestion"]["csv_sources"][1]["path"])
     api_endpoint = os.path.join(base_dir, cfg["ingestion"]["api_config"]["endpoint_mock_file"])
     scraped_dir = os.path.join(base_dir, cfg["ingestion"]["scraper_config"]["unstructured_html_dir"])
-    oltp_db_path = os.path.join(base_dir, cfg["storage"]["sqlite_raw_path"])
+    postgres_url = cfg["storage"]["postgres_url"]
     staging_dir = os.path.join(base_dir, cfg["storage"]["staging_dir"])
     os.makedirs(staging_dir, exist_ok=True)
-    os.makedirs(os.path.dirname(oltp_db_path), exist_ok=True)
 
     print("\n========================================================")
-    print("STEP 1: INGESTING RAW DATA FROM MULTIPLE SOURCES")
+    print("STEP 1: INGESTING RAW DATA INTO POSTGRESQL (OLTP LAYER)")
     print("========================================================")
 
     # 1. Ingest CSVs
@@ -51,13 +56,27 @@ def run_ingestion(config_path: str = "config/config.yaml") -> dict:
     df_docs_raw = pd.DataFrame(scraped_docs)
     print(f"[OK] Ingested {len(df_docs_raw)} unstructured documents/lease contracts.")
 
-    # 4. Save to OLTP Database (Simulating PostgreSQL Raw Tables)
-    conn = sqlite3.connect(oltp_db_path)
-    df_listings_raw.to_sql("raw_property_listings", conn, if_exists="replace", index=False)
-    df_locality_raw.to_sql("raw_locality_infrastructure", conn, if_exists="replace", index=False)
-    df_docs_raw.to_sql("raw_scraped_documents", conn, if_exists="replace", index=False)
-    conn.close()
-    print(f"[OK] Stored raw OLTP tables into {oltp_db_path}")
+    # 4. Save to PostgreSQL OLTP Layer using SQLAlchemy
+    if postgres_url.startswith("postgresql://"):
+        postgres_url = postgres_url.replace("postgresql://", "postgresql+psycopg2://", 1)
+    print(f"Connecting to PostgreSQL: {postgres_url.split('@')[-1]}")
+    engine = create_engine(postgres_url)
+    
+    # Write tables directly into PostgreSQL
+    df_listings_raw.to_sql("raw_property_listings", engine, if_exists="replace", index=False)
+    df_locality_raw.to_sql("raw_locality_infrastructure", engine, if_exists="replace", index=False)
+    df_docs_raw.to_sql("raw_scraped_documents", engine, if_exists="replace", index=False)
+
+    # Verify write directly with a row count query in PostgreSQL
+    with engine.connect() as conn:
+        c_listings = conn.execute(text("SELECT COUNT(*) FROM raw_property_listings")).scalar()
+        c_locality = conn.execute(text("SELECT COUNT(*) FROM raw_locality_infrastructure")).scalar()
+        c_docs = conn.execute(text("SELECT COUNT(*) FROM raw_scraped_documents")).scalar()
+
+    print(f"[OK] Successfully loaded into PostgreSQL via SQLAlchemy:")
+    print(f"  - raw_property_listings: {c_listings} rows")
+    print(f"  - raw_locality_infrastructure: {c_locality} rows")
+    print(f"  - raw_scraped_documents: {c_docs} rows")
 
     # 5. Save staging copy as parquet
     listings_staging_path = os.path.join(staging_dir, "raw_listings.parquet")
@@ -69,8 +88,13 @@ def run_ingestion(config_path: str = "config/config.yaml") -> dict:
         "raw_listings_count": len(df_listings_raw),
         "raw_locality_count": len(df_locality_raw),
         "raw_docs_count": len(df_docs_raw),
-        "oltp_db_path": oltp_db_path,
-        "staging_path": listings_staging_path
+        "postgres_url": postgres_url,
+        "staging_path": listings_staging_path,
+        "verified_postgres_counts": {
+            "raw_property_listings": c_listings,
+            "raw_locality_infrastructure": c_locality,
+            "raw_scraped_documents": c_docs
+        }
     }
 
 if __name__ == "__main__":
