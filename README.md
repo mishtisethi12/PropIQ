@@ -1,4 +1,4 @@
-# 🏢 PropIQ: End-to-End Real Estate Data Platform with a GenAI Assistant
+# PropIQ: End-to-End Real Estate Data Platform with a GenAI Assistant
 
 [![CI/CD Pipeline](https://github.com/propiq/propiq-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/propiq/propiq-platform/actions/workflows/ci.yml)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
@@ -11,7 +11,7 @@
 
 ---
 
-## 🎯 Which Job Description (JD) Gap Each Part Fills
+## Which Job Description (JD) Gap Each Part Fills
 
 | Platform Component | Technical Implementation in PropIQ | JD Requirement Covered |
 | :--- | :--- | :--- |
@@ -27,7 +27,7 @@
 
 ---
 
-## 🏛️ System Architecture
+## System Architecture
 
 ```mermaid
 flowchart TD
@@ -75,7 +75,7 @@ flowchart TD
 
 ---
 
-## 📐 Kimball Star Schema Design
+## Kimball Star Schema Design
 
 ```mermaid
 erDiagram
@@ -145,25 +145,25 @@ erDiagram
 
 ---
 
-## 🤖 ML Model Benchmark (Price & Rent Forecasting)
+## ML Model Benchmark (Price & Rent Forecasting)
 
 Evaluated on 1,594 deduplicated real estate properties across Delhi NCR and Bangalore:
 
 | Model Algorithm | $R^2$ Score | RMSE (INR) | MAE (INR) | MAPE (%) | Inference Latency |
 | :--- | :---: | :---: | :---: | :---: | :---: |
-| **XGBoost Regressor** | **0.9681** | **₹1,680,942** | **₹1,145,717** | **7.51%** | **0.009 ms** |
-| **Decision Forest (Random Forest)** | **0.9641** | **₹1,784,105** | **₹1,218,528** | **7.92%** | **0.088 ms** |
-| **k-Nearest Neighbors (k-NN)** | 0.9401 | ₹2,303,067 | ₹1,482,275 | 9.72% | 0.012 ms |
-| **Ridge Linear Regression** | 0.8652 | ₹3,454,372 | ₹2,402,554 | 20.98% | 0.001 ms |
+| **XGBoost Regressor** | **0.9681** | **INR 1,680,942** | **INR 1,145,717** | **7.51%** | **0.009 ms** |
+| **Decision Forest (Random Forest)** | **0.9641** | **INR 1,784,105** | **INR 1,218,528** | **7.92%** | **0.088 ms** |
+| **k-Nearest Neighbors (k-NN)** | 0.9401 | INR 2,303,067 | INR 1,482,275 | 9.72% | 0.012 ms |
+| **Ridge Linear Regression** | 0.8652 | INR 3,454,372 | INR 2,402,554 | 20.98% | 0.001 ms |
 
 ---
 
-## 💬 Hybrid GenAI Assistant in Action
+## Hybrid GenAI Assistant in Action
 
 When a user asks:
 > *"Which 2BHK areas in Noida have the best rental yield?"*
 
-1. **Text-to-SQL Stage**: Translates user intent into DuckDB Star Schema SQL:
+1. **Text-to-SQL Stage**: Translates user intent into Star Schema SQL:
    ```sql
    SELECT f.city, l.locality, p.bhk_label,
           ROUND(AVG(f.price_inr), 0) as avg_price,
@@ -178,14 +178,44 @@ When a user asks:
    ```
 2. **Vector Document Retrieval**: Fetches qualitative locality dossiers and lease regulations.
 3. **Synthesis Engine**: Cites exact ranking:
-   - **Sector 137 (4.81% Yield)**: Avg Price ₹81.3L, Avg Rent ₹32.5k/mo, Transit Rating 85/100.
-   - **Sector 62 (4.54% Yield)**: Avg Price ₹88.2L, Avg Rent ₹33.4k/mo, Transit Rating 92/100.
-   - **Sector 76 (4.39% Yield)**: Avg Price ₹82.7L, Avg Rent ₹30.2k/mo, Transit Rating 88/100.
-   - Highlights 11-month NCR tenancy agreements, standard 2-month security deposit norms, and 5-7% annual rent escalation terms!
+   - **Sector 137 (4.81% Yield)**: Avg Price INR 81.3L, Avg Rent INR 32.5k/mo, Transit Rating 85/100.
+   - **Sector 62 (4.54% Yield)**: Avg Price INR 88.2L, Avg Rent INR 33.4k/mo, Transit Rating 92/100.
+   - **Sector 76 (4.39% Yield)**: Avg Price INR 82.7L, Avg Rent INR 30.2k/mo, Transit Rating 88/100.
+   - Highlights 11-month NCR tenancy agreements, standard 2-month security deposit norms, and 5-7% annual rent escalation terms.
 
 ---
 
-## 🚀 Quickstart Guide
+## Snowflake Cloud Data Warehouse Setup
+
+PropIQ provides dual OLAP warehouse support: **DuckDB** (embedded columnar execution for zero-latency local development) and **Snowflake** (production cloud data warehouse).
+
+### 1. Configure Credentials
+Set your credentials in `config/config.yaml` or export environment variables:
+```bash
+export SNOWFLAKE_ACCOUNT="your_account_identifier"  # e.g. "xy12345.ap-south-1" or "ORG-ACCOUNT"
+export SNOWFLAKE_USER="your_username"
+export SNOWFLAKE_PASSWORD="your_password"
+export SNOWFLAKE_ROLE="ACCOUNTADMIN"
+```
+
+### 2. Automated Provisioning & Data Loading
+Execute the standalone automated Snowflake loader:
+```bash
+python src/warehouse/snowflake_loader.py
+```
+This utility:
+- Provisions Virtual Warehouse `PROPIQ_WH` (Size: XSMALL, auto-suspend 60s)
+- Creates Database `PROPIQ_DW` and Schema `CORE_STAR_SCHEMA`
+- Executes table DDL from `src/warehouse/ddl_snowflake.sql` (`DIM_DATE`, `DIM_LOCATION`, `DIM_PROPERTY_TYPE`, `DIM_AMENITIES`, clustered `FACT_PROPERTY_LISTINGS`)
+- Bulk uploads local Parquet marts using Snowflake's high-speed `write_pandas` engine
+- Runs verification queries and logs row counts
+
+### 3. Streamlit Cloud DW Workbench
+You can also configure credentials, trigger the bulk loader, and execute live queries against your Snowflake trial account directly from the **Star Schema & DW -> Cloud Data Warehouse (Snowflake)** tab in the dashboard.
+
+---
+
+## Quickstart Guide
 
 ### 1. Clone & Install Dependencies
 ```bash
@@ -208,7 +238,7 @@ Open your browser at `http://localhost:8501`.
 
 ---
 
-## 🐳 Docker & Cloud Deployment
+## Docker & Cloud Deployment
 
 ### Run Multi-Container with Docker Compose
 ```bash
@@ -235,5 +265,6 @@ gcloud builds submit --config=cloud/gcp/cloudbuild.yaml
 
 ---
 
-## 📊 Power BI & Tableau Integration
+## BI & Data Exports
 Star schema marts are exported to `data/warehouse/export_powerbi/`. Copy the ready-made DAX measures from `power_bi/dax_measures.txt` for instantaneous reporting in Power BI Desktop!
+

@@ -120,11 +120,23 @@ class SQLAnalyticsAgent:
 
         return None, "unstructured_search"
 
-    def execute_sql(self, sql_query: str) -> pd.DataFrame:
-        """Executes generated SQL against DuckDB warehouse"""
+    def execute_sql(self, sql_query: str, backend: str = "duckdb") -> pd.DataFrame:
+        """Executes generated SQL against DuckDB or Snowflake warehouse"""
+        if backend.lower() == "snowflake":
+            try:
+                from src.warehouse.snowflake_loader import SnowflakeWarehouseManager
+                manager = SnowflakeWarehouseManager()
+                if manager.is_configured():
+                    df = manager.query(sql_query)
+                    df.columns = [c.lower() for c in df.columns]
+                    return df
+            except Exception as e:
+                print(f"Warning: Snowflake query failed ({e}), falling back to DuckDB.")
+
         con = duckdb.connect(database=self.duckdb_path, read_only=True)
         try:
             df = con.execute(sql_query).fetchdf()
         finally:
             con.close()
         return df
+

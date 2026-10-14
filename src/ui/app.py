@@ -39,6 +39,7 @@ AUDIT_PATH = os.path.join(BASE_DIR, "data/staging/deduplication_audit.csv")
 from src.ml.predict import PropertyValuationService
 from src.rag.assistant import PropIQAssistant
 from src.warehouse.partitioning import PartitioningEngine
+from src.warehouse.snowflake_loader import SnowflakeWarehouseManager
 
 # Custom Dark Theme CSS matching template
 st.markdown("""
@@ -340,11 +341,16 @@ with st.sidebar:
         ]
     )
 
+    sf_mgr = SnowflakeWarehouseManager()
+    sf_status = "Connected" if sf_mgr.is_configured() else "Trial Ready"
+    sf_color = "#B4F73E" if sf_mgr.is_configured() else "#8E929A"
+
     st.markdown('<div class="sidebar-section-label">PLATFORM SPECS</div>', unsafe_allow_html=True)
-    st.markdown("""
+    st.markdown(f"""
     <div style="font-size: 0.78rem; color: #72767F; line-height: 1.6;">
     - OLTP: PostgreSQL<br>
     - OLAP: DuckDB & Snowflake<br>
+    - Snowflake Status: <span style="color: {sf_color}; font-weight: 600;">{sf_status}</span><br>
     - Partitions: City & Month<br>
     - ML: Forest, k-NN, XGBoost<br>
     - RAG: Text-to-SQL + Vector
@@ -720,15 +726,24 @@ elif nav_selection == "GenAI Research Copilot":
         <div style="font-size: 1.15rem; font-weight: 700; color: #FFFFFF; margin-bottom: 12px;">Conversational Query Engine</div>
     """, unsafe_allow_html=True)
 
-    q_text = st.text_input(
-        "Research Question",
-        value="Which 2BHK areas in Noida have the best rental yield?"
-    )
+    col_q, col_be = st.columns([3, 1])
+    with col_q:
+        q_text = st.text_input(
+            "Research Question",
+            value="Which 2BHK areas in Noida have the best rental yield?"
+        )
+    with col_be:
+        be_option = st.selectbox(
+            "Warehouse Backend",
+            ["DuckDB (Local Columnar)", "Snowflake (Cloud DW)"]
+        )
+    
+    target_backend = "snowflake" if "Snowflake" in be_option else "duckdb"
 
     if st.button("Execute Intelligence Query"):
-        with st.spinner("Synthesizing warehouse facts and document context..."):
+        with st.spinner(f"Synthesizing facts via {be_option} and document context..."):
             asst = PropIQAssistant(DUCKDB_PATH, DOCS_DIR)
-            ans_pkg = asst.answer_query(q_text)
+            ans_pkg = asst.answer_query(q_text, warehouse_backend=target_backend)
 
             st.markdown(ans_pkg["answer"])
 
@@ -750,89 +765,266 @@ elif nav_selection == "Star Schema & DW":
     st.markdown("""
     <div class="dashboard-title-container">
         <div>
-            <div class="dashboard-main-title">Star Schema & Physical Partitions</div>
-            <div class="dashboard-subtitle">Kimball dimensional architecture and partition pruning benchmarks.</div>
+            <div class="dashboard-main-title">Star Schema & Enterprise Warehouses</div>
+            <div class="dashboard-subtitle">Kimball dimensional architecture, DuckDB partition pruning, and Snowflake Cloud DW integration.</div>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
-    part_dir = os.path.join(BASE_DIR, "data/warehouse/partitions")
-    unpart_file = os.path.join(BASE_DIR, "data/warehouse/fact_property_listings.parquet")
+    tab_local_dw, tab_snowflake_dw = st.tabs(["Local Partitioned Warehouse (DuckDB)", "Cloud Data Warehouse (Snowflake)"])
 
-    if os.path.exists(unpart_file) and os.path.exists(part_dir):
-        p_engine = PartitioningEngine(part_dir)
-        bench = p_engine.benchmark_partition_pruning(unpart_file, target_city="Noida")
+    with tab_local_dw:
+        part_dir = os.path.join(BASE_DIR, "data/warehouse/partitions")
+        unpart_file = os.path.join(BASE_DIR, "data/warehouse/fact_property_listings.parquet")
 
-        b1, b2, b3 = st.columns(3)
-        with b1:
+        if os.path.exists(unpart_file) and os.path.exists(part_dir):
+            p_engine = PartitioningEngine(part_dir)
+            bench = p_engine.benchmark_partition_pruning(unpart_file, target_city="Noida")
+
+            b1, b2, b3 = st.columns(3)
+            with b1:
+                st.markdown(f"""
+                <div class="dark-card">
+                    <div class="dark-card-label">Unpartitioned Scan Time</div>
+                    <div class="dark-card-value-white">{bench['unpartitioned_scan_time_sec'] * 1000:.2f} ms</div>
+                    <div class="dark-card-subtext">Full table scan</div>
+                </div>
+                """, unsafe_allow_html=True)
+            with b2:
+                st.markdown(f"""
+                <div class="dark-card">
+                    <div class="dark-card-label">Partition Pruned Time</div>
+                    <div class="dark-card-value-lime">{bench['partition_pruned_scan_time_sec'] * 1000:.2f} ms</div>
+                    <div class="dark-card-subtext">Direct city partition</div>
+                </div>
+                """, unsafe_allow_html=True)
+            with b3:
+                st.markdown(f"""
+                <div class="dark-card">
+                    <div class="dark-card-label">Target Submarket</div>
+                    <div class="dark-card-value-white">{bench['target_city']}</div>
+                    <div class="dark-card-subtext">{bench['speedup_factor']}</div>
+                </div>
+                """, unsafe_allow_html=True)
+
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown("""
+        <div class="dark-card">
+            <div style="font-size: 1.15rem; font-weight: 700; color: #FFFFFF; margin-bottom: 12px;">Kimball Star Schema ERD</div>
+        """, unsafe_allow_html=True)
+        st.code("""
+                                   +-------------------+
+                                   |     DIM_DATE      |
+                                   |-------------------|
+                                   | date_key (PK)     |
+                                   | full_date         |
+                                   | month_name        |
+                                   | year              |
+                                   +---------+---------+
+                                             |
+                                             v
+        +------------------+  +--------------------------------+  +----------------------+
+        |   DIM_LOCATION   |  |     FACT_PROPERTY_LISTINGS     |  |  DIM_PROPERTY_TYPE   |
+        |------------------|  |--------------------------------|  |----------------------|
+        | location_key(PK) |->| listing_id (PK)                |<-| property_type_key(PK)|
+        | city             |  | date_key (FK)                  |  | bhk_count            |
+        | locality         |  | location_key (FK)              |  | bhk_label            |
+        | transit_score    |  | property_type_key (FK)         |  | property_category    |
+        | safety_score     |  | amenity_key (FK)               |  | furnishing_status    |
+        +------------------+  | city (Partition Key)           |  +----------------------+
+                              | price_inr (Measure)            |
+                              | rent_inr (Measure)             |
+                              | carpet_area_sqft (Measure)     |
+                              | price_per_sqft (Derived)       |
+                              | rental_yield_pct (Derived)     |
+                              +---------------+----------------+
+                                              |
+                                              v
+                                    +-------------------+
+                                    |   DIM_AMENITIES   |
+                                    |-------------------|
+                                    | amenity_key (PK)  |
+                                    | has_parking       |
+                                    | has_gym           |
+                                    | has_swimming_pool |
+                                    | amenity_tier      |
+                                    +-------------------+
+        """, language="text")
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    with tab_snowflake_dw:
+        sf_manager = SnowflakeWarehouseManager()
+        is_sf_ready = sf_manager.is_configured()
+
+        # Top Snowflake Metric Cards
+        sfc1, sfc2, sfc3, sfc4 = st.columns(4)
+        with sfc1:
             st.markdown(f"""
             <div class="dark-card">
-                <div class="dark-card-label">Unpartitioned Scan Time</div>
-                <div class="dark-card-value-white">{bench['unpartitioned_scan_time_sec'] * 1000:.2f} ms</div>
-                <div class="dark-card-subtext">Full table scan</div>
+                <div class="dark-card-label">Snowflake Account</div>
+                <div class="dark-card-value-white" style="font-size: 1.1rem;">{sf_manager.account or 'Not Configured'}</div>
+                <div class="dark-card-subtext">Region / Account ID</div>
             </div>
             """, unsafe_allow_html=True)
-        with b2:
+        with sfc2:
             st.markdown(f"""
             <div class="dark-card">
-                <div class="dark-card-label">Partition Pruned Time</div>
-                <div class="dark-card-value-lime">{bench['partition_pruned_scan_time_sec'] * 1000:.2f} ms</div>
-                <div class="dark-card-subtext">Direct city partition</div>
+                <div class="dark-card-label">Warehouse & Role</div>
+                <div class="dark-card-value-white" style="font-size: 1.1rem;">{sf_manager.warehouse}</div>
+                <div class="dark-card-subtext">Role: {sf_manager.role}</div>
             </div>
             """, unsafe_allow_html=True)
-        with b3:
+        with sfc3:
             st.markdown(f"""
             <div class="dark-card">
-                <div class="dark-card-label">Target Submarket</div>
-                <div class="dark-card-value-white">{bench['target_city']}</div>
-                <div class="dark-card-subtext">{bench['speedup_factor']}</div>
+                <div class="dark-card-label">Target Star Schema</div>
+                <div class="dark-card-value-white" style="font-size: 1.1rem;">{sf_manager.database}</div>
+                <div class="dark-card-subtext">Schema: {sf_manager.schema}</div>
+            </div>
+            """, unsafe_allow_html=True)
+        with sfc4:
+            conn_status = "Connected" if is_sf_ready else "Pending Setup"
+            conn_color = "dark-card-value-lime" if is_sf_ready else "dark-card-value-white"
+            st.markdown(f"""
+            <div class="dark-card">
+                <div class="dark-card-label">Integration Status</div>
+                <div class="{conn_color}" style="font-size: 1.1rem;">{conn_status}</div>
+                <div class="dark-card-subtext">Trial Cloud DW</div>
             </div>
             """, unsafe_allow_html=True)
 
-    st.markdown("<br>", unsafe_allow_html=True)
-    st.markdown("""
-    <div class="dark-card">
-        <div style="font-size: 1.15rem; font-weight: 700; color: #FFFFFF; margin-bottom: 12px;">Kimball Star Schema ERD</div>
-    """, unsafe_allow_html=True)
-    st.code("""
-                               +-------------------+
-                               |     DIM_DATE      |
-                               |-------------------|
-                               | date_key (PK)     |
-                               | full_date         |
-                               | month_name        |
-                               | year              |
-                               +---------+---------+
-                                         |
-                                         v
-    +------------------+  +--------------------------------+  +----------------------+
-    |   DIM_LOCATION   |  |     FACT_PROPERTY_LISTINGS     |  |  DIM_PROPERTY_TYPE   |
-    |------------------|  |--------------------------------|  |----------------------|
-    | location_key(PK) |->| listing_id (PK)                |<-| property_type_key(PK)|
-    | city             |  | date_key (FK)                  |  | bhk_count            |
-    | locality         |  | location_key (FK)              |  | bhk_label            |
-    | transit_score    |  | property_type_key (FK)         |  | property_category    |
-    | safety_score     |  | amenity_key (FK)               |  | furnishing_status    |
-    +------------------+  | city (Partition Key)           |  +----------------------+
-                          | price_inr (Measure)            |
-                          | rent_inr (Measure)             |
-                          | carpet_area_sqft (Measure)     |
-                          | price_per_sqft (Derived)       |
-                          | rental_yield_pct (Derived)     |
-                          +---------------+----------------+
-                                          |
-                                          v
-                                +-------------------+
-                                |   DIM_AMENITIES   |
-                                |-------------------|
-                                | amenity_key (PK)  |
-                                | has_parking       |
-                                | has_gym           |
-                                | has_swimming_pool |
-                                | amenity_tier      |
-                                +-------------------+
-    """, language="text")
-    st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown("<br>", unsafe_allow_html=True)
+
+        # Credentials & Configuration Container
+        with st.expander("Snowflake Credentials Configuration (Trial Account)", expanded=not is_sf_ready):
+            st.markdown("""
+            Enter your Snowflake trial credentials below or set them in <code>config/config.yaml</code>.
+            Your account identifier looks like <code>xy12345.ap-south-1</code> or <code>ORGNAME-ACCOUNTNAME</code>.
+            """, unsafe_allow_html=True)
+
+            with st.form("sf_config_form"):
+                cfg_col1, cfg_col2 = st.columns(2)
+                with cfg_col1:
+                    sf_inp_account = st.text_input("Account Identifier", value=sf_manager.account)
+                    sf_inp_user = st.text_input("Username", value=sf_manager.user)
+                    sf_inp_password = st.text_input("Password", value=sf_manager.password, type="password")
+                with cfg_col2:
+                    sf_inp_role = st.text_input("Role", value=sf_manager.role)
+                    sf_inp_wh = st.text_input("Virtual Warehouse", value=sf_manager.warehouse)
+                    sf_inp_db = st.text_input("Database", value=sf_manager.database)
+                    sf_inp_schema = st.text_input("Schema", value=sf_manager.schema)
+
+                sf_save_btn = st.form_submit_button("Save Credentials to config/config.yaml")
+                if sf_save_btn:
+                    try:
+                        cfg_path = os.path.join(BASE_DIR, "config/config.yaml")
+                        import yaml
+                        with open(cfg_path, "r", encoding="utf-8") as yf:
+                            cfg_data = yaml.safe_load(yf)
+                        if "snowflake" not in cfg_data:
+                            cfg_data["snowflake"] = {}
+                        cfg_data["snowflake"]["account"] = sf_inp_account.strip()
+                        cfg_data["snowflake"]["user"] = sf_inp_user.strip()
+                        cfg_data["snowflake"]["password"] = sf_inp_password.strip()
+                        cfg_data["snowflake"]["role"] = sf_inp_role.strip()
+                        cfg_data["snowflake"]["warehouse"] = sf_inp_wh.strip()
+                        cfg_data["snowflake"]["database"] = sf_inp_db.strip()
+                        cfg_data["snowflake"]["schema"] = sf_inp_schema.strip()
+                        with open(cfg_path, "w", encoding="utf-8") as yf:
+                            yaml.safe_dump(cfg_data, yf, default_flow_style=False, sort_keys=False)
+                        st.success("Snowflake configuration saved to config/config.yaml. Reloading...")
+                        st.rerun()
+                    except Exception as err:
+                        st.error(f"Failed to update config.yaml: {err}")
+
+        st.markdown("<br>", unsafe_allow_html=True)
+
+        # Operational Pipelines Container
+        st.markdown("""
+        <div class="dark-card">
+            <div style="font-size: 1.15rem; font-weight: 700; color: #FFFFFF; margin-bottom: 12px;">Cloud Data Warehouse Lifecycle & Operations</div>
+        """, unsafe_allow_html=True)
+
+        op_col1, op_col2, op_col3 = st.columns(3)
+        with op_col1:
+            if st.button("1. Test Connection"):
+                try:
+                    with st.spinner("Connecting to Snowflake..."):
+                        conn = sf_manager.get_connection(target_db=False)
+                        cs = conn.cursor()
+                        cs.execute("SELECT CURRENT_VERSION(), CURRENT_USER(), CURRENT_ROLE()")
+                        ver, u, r = cs.fetchone()
+                        cs.close()
+                        conn.close()
+                        st.success(f"[OK] Connected! Snowflake Version: {ver} | User: {u} | Role: {r}")
+                except Exception as ex:
+                    st.error(f"Connection error: {ex}")
+
+        with op_col2:
+            if st.button("2. Provision & Execute DDL"):
+                try:
+                    with st.spinner("Provisioning warehouse, database and executing DDL..."):
+                        sf_manager.provision_environment()
+                        sf_manager.execute_ddl()
+                        st.success("[OK] Warehouse objects and star schema DDLs provisioned successfully.")
+                except Exception as ex:
+                    st.error(f"Provisioning error: {ex}")
+
+        with op_col3:
+            if st.button("3. Bulk Upload Star Schema"):
+                try:
+                    with st.spinner("Uploading dimensional Parquet datasets via write_pandas..."):
+                        loaded = sf_manager.load_star_schema()
+                        st.success(f"[OK] Star schema uploaded successfully: {loaded}")
+                except Exception as ex:
+                    st.error(f"Upload error: {ex}")
+
+        st.markdown('</div>', unsafe_allow_html=True)
+
+        st.markdown("<br>", unsafe_allow_html=True)
+
+        # Interactive SQL Workbench
+        st.markdown("""
+        <div class="dark-card">
+            <div style="font-size: 1.15rem; font-weight: 700; color: #FFFFFF; margin-bottom: 12px;">Interactive Snowflake SQL Console</div>
+            <div style="font-size: 0.85rem; color: #8E929A; margin-bottom: 12px;">Run live analytical SQL queries directly against Snowflake Cloud Data Warehouse:</div>
+        """, unsafe_allow_html=True)
+
+        default_sf_query = f"""SELECT 
+    f.CITY,
+    l.LOCALITY,
+    p.BHK_LABEL,
+    COUNT(*) as TOTAL_PROPERTIES,
+    ROUND(AVG(f.PRICE_INR), 0) as AVG_PRICE,
+    ROUND(AVG(f.RENT_INR), 0) as AVG_RENT,
+    ROUND(AVG(f.RENTAL_YIELD_PCT), 2) as AVG_YIELD_PCT
+FROM {sf_manager.database}.{sf_manager.schema}.FACT_PROPERTY_LISTINGS f
+JOIN {sf_manager.database}.{sf_manager.schema}.DIM_LOCATION l ON f.LOCATION_KEY = l.LOCATION_KEY
+JOIN {sf_manager.database}.{sf_manager.schema}.DIM_PROPERTY_TYPE p ON f.PROPERTY_TYPE_KEY = p.PROPERTY_TYPE_KEY
+WHERE f.CITY = 'Noida' AND p.BHK_COUNT = 2
+GROUP BY f.CITY, l.LOCALITY, p.BHK_LABEL
+ORDER BY AVG_YIELD_PCT DESC
+LIMIT 5;"""
+
+        sf_sql_input = st.text_area("SQL Query", value=default_sf_query, height=180)
+
+        if st.button("Execute Snowflake SQL"):
+            if not is_sf_ready:
+                st.warning("Please configure your Snowflake credentials above before running queries.")
+            else:
+                try:
+                    import time
+                    start_t = time.perf_counter()
+                    with st.spinner("Executing query on Snowflake cloud warehouse..."):
+                        sf_df = sf_manager.query(sf_sql_input)
+                    latency_ms = (time.perf_counter() - start_t) * 1000
+                    st.markdown(f"<span style='color: #B4F73E; font-weight: 600;'>[OK] Returned {len(sf_df)} rows in {latency_ms:.2f} ms</span>", unsafe_allow_html=True)
+                    st.dataframe(sf_df, use_container_width=True)
+                except Exception as ex:
+                    st.error(f"Query execution error: {ex}")
+
+        st.markdown('</div>', unsafe_allow_html=True)
+
 
 # ==============================================================================
 # VIEW 6: BI & Data Exports

@@ -80,3 +80,13 @@ rag:
   top_k: 4
   vector_dim: 128
   model_provider: "gemini_with_fallback"
+
+snowflake:
+  account: ""             # e.g., 'xy12345.ap-south-1' or 'ORGNAME-ACCOUNTNAME'
+  user: ""                # Your Snowflake username
+  password: ""            # Or set via SNOWFLAKE_PASSWORD env var
+  role: "ACCOUNTADMIN"
+  warehouse: "PROPIQ_WH"
+  database: "PROPIQ_DW"
+  schema: "CORE_STAR_SCHEMA"
+

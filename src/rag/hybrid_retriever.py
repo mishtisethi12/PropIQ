@@ -14,7 +14,7 @@ class HybridRetriever:
         self.vector_index = SemanticVectorIndex()
         self.vector_index.build_index_from_directory(docs_dir)
 
-    def retrieve(self, user_query: str) -> Dict[str, Any]:
+    def retrieve(self, user_query: str, warehouse_backend: str = "duckdb") -> Dict[str, Any]:
         """
         Executes hybrid retrieval:
         1. Checks for SQL analytical intent
@@ -27,7 +27,7 @@ class HybridRetriever:
 
         if sql_query:
             try:
-                sql_df = self.sql_agent.execute_sql(sql_query)
+                sql_df = self.sql_agent.execute_sql(sql_query, backend=warehouse_backend)
                 sql_data_dict = sql_df.to_dict(orient="records")
             except Exception as e:
                 print(f"Warning: SQL execution error: {e}")

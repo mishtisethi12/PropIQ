@@ -71,9 +71,9 @@ class PropIQAssistant:
 
         return "\n".join(lines)
 
-    def answer_query(self, user_query: str) -> Dict[str, Any]:
+    def answer_query(self, user_query: str, warehouse_backend: str = "duckdb") -> Dict[str, Any]:
         """Processes user question using Hybrid RAG (SQL + Documents + LLM)"""
-        retrieval_pkg = self.retriever.retrieve(user_query)
+        retrieval_pkg = self.retriever.retrieve(user_query, warehouse_backend=warehouse_backend)
 
         # Try Gemini API if key is available
         llm_answer = None
