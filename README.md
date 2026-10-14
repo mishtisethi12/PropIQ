@@ -158,30 +158,33 @@ Evaluated on 1,594 deduplicated real estate properties across Delhi NCR and Bang
 
 ---
 
-## Hybrid GenAI Assistant in Action
+## Dual-Engine GenAI Research Copilot
 
-When a user asks:
-> *"Which 2BHK areas in Noida have the best rental yield?"*
+PropIQ features a production dual-mode GenAI Copilot combining **Vector Document RAG (ChromaDB)** and **Structured Text-to-SQL (DuckDB / Snowflake)**:
 
-1. **Text-to-SQL Stage**: Translates user intent into Star Schema SQL:
-   ```sql
-   SELECT f.city, l.locality, p.bhk_label,
-          ROUND(AVG(f.price_inr), 0) as avg_price,
-          ROUND(AVG(f.rent_inr), 0) as avg_rent,
-          ROUND(AVG(f.rental_yield_pct), 2) as avg_rental_yield_pct
-   FROM fact_property_listings f
-   JOIN dim_location l ON f.location_key = l.location_key
-   JOIN dim_property_type p ON f.property_type_key = p.property_type_key
-   WHERE f.city = 'Noida' AND p.bhk_count = 2
-   GROUP BY f.city, l.locality, p.bhk_label
-   ORDER BY avg_rental_yield_pct DESC LIMIT 5;
-   ```
-2. **Vector Document Retrieval**: Fetches qualitative locality dossiers and lease regulations.
-3. **Synthesis Engine**: Cites exact ranking:
-   - **Sector 137 (4.81% Yield)**: Avg Price INR 81.3L, Avg Rent INR 32.5k/mo, Transit Rating 85/100.
-   - **Sector 62 (4.54% Yield)**: Avg Price INR 88.2L, Avg Rent INR 33.4k/mo, Transit Rating 92/100.
-   - **Sector 76 (4.39% Yield)**: Avg Price INR 82.7L, Avg Rent INR 30.2k/mo, Transit Rating 88/100.
-   - Highlights 11-month NCR tenancy agreements, standard 2-month security deposit norms, and 5-7% annual rent escalation terms.
+### Mode 1: Semantic Document RAG (ChromaDB + all-MiniLM-L6-v2 + MMR)
+- **Vector Store**: Persistent ChromaDB (`data/warehouse/chroma_db`) indexed with `all-MiniLM-L6-v2` embeddings.
+- **Embedded Knowledge**: Verified property listings (descriptions, pricing, amenities, yields), statutory residential lease agreements (NCR & Bangalore models), and locality infrastructure reports.
+- **Maximal Marginal Relevance (MMR)**: Balances semantic relevance and document diversity:
+  $$\text{MMR} = \arg\max_{d_i \in R \setminus S} \left[ \lambda \cdot \text{Sim}(d_i, q) - (1 - \lambda) \max_{d_j \in S} \text{Sim}(d_i, d_j) \right]$$
+  Adjustable $\lambda$ parameter ($0.1$ to $1.0$) prevents redundancy in retrieved context.
+- **Metadata Filtering**: Exact filtering by `city` (Noida, Gurgaon, Delhi, Bangalore, Greater Noida) and `locality` (e.g., Sector 137, Indiranagar).
+- **Source Document Transparency**: Every synthesized answer renders ranked source cards showing document title, category badge, city, locality, MMR similarity score, and excerpt.
+
+### Mode 2: Structured Star Schema Text-to-SQL
+Translates complex natural language queries into executable SQL over Kimball fact and dimension tables on DuckDB or Snowflake:
+```sql
+SELECT f.city, l.locality, p.bhk_label,
+       ROUND(AVG(f.price_inr), 0) as avg_price,
+       ROUND(AVG(f.rent_inr), 0) as avg_rent,
+       ROUND(AVG(f.rental_yield_pct), 2) as avg_rental_yield_pct
+FROM fact_property_listings f
+JOIN dim_location l ON f.location_key = l.location_key
+JOIN dim_property_type p ON f.property_type_key = p.property_type_key
+WHERE f.city = 'Noida' AND p.bhk_count = 2
+GROUP BY f.city, l.locality, p.bhk_label
+ORDER BY avg_rental_yield_pct DESC LIMIT 5;
+```
 
 ---
 

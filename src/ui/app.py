@@ -38,6 +38,7 @@ AUDIT_PATH = os.path.join(BASE_DIR, "data/staging/deduplication_audit.csv")
 # Top-level service imports
 from src.ml.predict import PropertyValuationService
 from src.rag.assistant import PropIQAssistant
+from src.rag.chroma_rag import ChromaRAGService
 from src.warehouse.partitioning import PartitioningEngine
 from src.warehouse.snowflake_loader import SnowflakeWarehouseManager
 
@@ -350,10 +351,11 @@ with st.sidebar:
     <div style="font-size: 0.78rem; color: #72767F; line-height: 1.6;">
     - OLTP: PostgreSQL<br>
     - OLAP: DuckDB & Snowflake<br>
-    - Snowflake Status: <span style="color: {sf_color}; font-weight: 600;">{sf_status}</span><br>
-    - Partitions: City & Month<br>
+    - Snowflake: <span style="color: {sf_color}; font-weight: 600;">{sf_status}</span><br>
+    - Vector Store: ChromaDB (MiniLM)<br>
+    - Retrieval: MMR (Maximal Marginal)<br>
     - ML: Forest, k-NN, XGBoost<br>
-    - RAG: Text-to-SQL + Vector
+    - Copilot: RAG & Text-to-SQL
     </div>
     """, unsafe_allow_html=True)
 
@@ -716,47 +718,188 @@ elif nav_selection == "GenAI Research Copilot":
     <div class="dashboard-title-container">
         <div>
             <div class="dashboard-main-title">GenAI Research Copilot</div>
-            <div class="dashboard-subtitle">Hybrid retrieval combining Star Schema Text-to-SQL and Vector documents.</div>
+            <div class="dashboard-subtitle">Dual-engine intelligence: Semantic Vector RAG with ChromaDB & MMR, and Kimball Star Schema Text-to-SQL.</div>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
-    st.markdown("""
-    <div class="dark-card">
-        <div style="font-size: 1.15rem; font-weight: 700; color: #FFFFFF; margin-bottom: 12px;">Conversational Query Engine</div>
-    """, unsafe_allow_html=True)
+    copilot_mode = st.radio(
+        "Copilot Mode",
+        [
+            "Semantic Document RAG (ChromaDB + MMR)",
+            "Structured Text-to-SQL Analytics (DuckDB / Snowflake)"
+        ],
+        horizontal=True
+    )
 
-    col_q, col_be = st.columns([3, 1])
-    with col_q:
-        q_text = st.text_input(
-            "Research Question",
-            value="Which 2BHK areas in Noida have the best rental yield?"
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # --------------------------------------------------------------------------
+    # MODE 1: Semantic Document RAG (ChromaDB + all-MiniLM-L6-v2 + MMR)
+    # --------------------------------------------------------------------------
+    if copilot_mode == "Semantic Document RAG (ChromaDB + MMR)":
+        city_localities = {
+            "All Cities": ["All Localities"],
+            "Noida": ["All Localities", "Sector 137", "Sector 62", "Sector 76", "Sector 128", "Sector 150", "Sector 18"],
+            "Greater Noida": ["All Localities", "Alpha 1", "Omega 1", "Pari Chowk", "Greater Noida West"],
+            "Gurgaon": ["All Localities", "Cyber City", "Golf Course Road", "Sector 57", "Sohna Road"],
+            "Delhi": ["All Localities", "Dwarka", "Saket", "Mayur Vihar", "Rohini"],
+            "Bangalore": ["All Localities", "Indiranagar", "Whitefield", "HSR Layout", "Electronic City"]
+        }
+
+        st.markdown("""
+        <div class="dark-card">
+            <div style="font-size: 1.15rem; font-weight: 700; color: #FFFFFF; margin-bottom: 6px;">Semantic Knowledge Base & Tenancy Regulations</div>
+            <div style="font-size: 0.82rem; color: #8E929A; margin-bottom: 16px;">
+                Vector retrieval over property listing descriptions, statutory tenancy agreements, and locality reports embedded via <code>all-MiniLM-L6-v2</code> into ChromaDB.
+            </div>
+        """, unsafe_allow_html=True)
+
+        # Filter bar
+        fc1, fc2, fc3, fc4 = st.columns([1.2, 1.2, 1.2, 0.8])
+        with fc1:
+            sel_city = st.selectbox("City Filter", list(city_localities.keys()), index=1)
+        with fc2:
+            loc_options = city_localities.get(sel_city, ["All Localities"])
+            sel_loc = st.selectbox("Locality Filter", loc_options)
+        with fc3:
+            mmr_lambda = st.slider("MMR Diversity Lambda", min_value=0.1, max_value=1.0, value=0.7, step=0.05, help="1.0 = Pure relevance similarity, 0.1 = Maximum document diversity")
+        with fc4:
+            top_k_docs = st.slider("Documents (k)", min_value=2, max_value=8, value=4)
+
+        # Query input
+        rag_query = st.text_input(
+            "Research Query",
+            value="What are the standard lock-in period and security deposit rules for renting in Noida or NCR?"
         )
-    with col_be:
-        be_option = st.selectbox(
-            "Warehouse Backend",
-            ["DuckDB (Local Columnar)", "Snowflake (Cloud DW)"]
-        )
-    
-    target_backend = "snowflake" if "Snowflake" in be_option else "duckdb"
 
-    if st.button("Execute Intelligence Query"):
-        with st.spinner(f"Synthesizing facts via {be_option} and document context..."):
-            asst = PropIQAssistant(DUCKDB_PATH, DOCS_DIR)
-            ans_pkg = asst.answer_query(q_text, warehouse_backend=target_backend)
+        col_btn1, col_btn2 = st.columns([1.5, 1])
+        with col_btn1:
+            execute_rag = st.button("Execute RAG Research Query")
+        with col_btn2:
+            reindex_rag = st.button("Re-index ChromaDB Vector Store")
 
-            st.markdown(ans_pkg["answer"])
+        if reindex_rag:
+            with st.spinner("Embedding listings, lease contracts, and locality profiles into ChromaDB..."):
+                rag_service = ChromaRAGService()
+                re_res = rag_service.ingest_knowledge_base(force_reindex=True)
+                st.success(f"[OK] ChromaDB re-indexed successfully with {re_res['total_indexed']} documents.")
 
-            if ans_pkg["sql_query"]:
-                with st.expander("Underlying SQL Executed on Star Schema"):
-                    st.code(ans_pkg["sql_query"], language="sql")
+        if execute_rag:
+            with st.spinner("Retrieving diverse documents via MMR and synthesizing answer..."):
+                rag_service = ChromaRAGService()
+                effective_city = None if sel_city == "All Cities" else sel_city
+                effective_loc = None if sel_loc == "All Localities" else sel_loc
 
-            if ans_pkg["citations"]:
-                with st.expander("Knowledge Base Document Citations"):
-                    for c in ans_pkg["citations"]:
-                        st.markdown(f"- {c}")
+                rag_result = rag_service.answer_query(
+                    query=rag_query,
+                    city_filter=effective_city,
+                    locality_filter=effective_loc,
+                    k=top_k_docs,
+                    lambda_mult=mmr_lambda
+                )
 
-    st.markdown('</div>', unsafe_allow_html=True)
+                # Render LLM Answer
+                st.markdown("<br>", unsafe_allow_html=True)
+                st.markdown("""
+                <div style="font-size: 1.05rem; font-weight: 700; color: #FFFFFF; margin-bottom: 8px;">
+                    Synthesized Intelligence Response
+                </div>
+                """, unsafe_allow_html=True)
+                st.markdown(rag_result["answer"])
+
+                # Render Retrieved Source Documents
+                st.markdown("<br>", unsafe_allow_html=True)
+                st.markdown(f"""
+                <div style="font-size: 1.05rem; font-weight: 700; color: #FFFFFF; margin-bottom: 12px;">
+                    Retrieved Source Documents (MMR Selected & Ranked: {len(rag_result['sources'])})
+                </div>
+                """, unsafe_allow_html=True)
+
+                if not rag_result["sources"]:
+                    st.info("No matching source documents found with the given filter combination.")
+                else:
+                    for src in rag_result["sources"]:
+                        doc_type_raw = src.get("doc_type", "document")
+                        if doc_type_raw == "lease_agreement":
+                            badge_color = "#B4F73E"
+                            badge_bg = "rgba(180, 247, 62, 0.12)"
+                        elif doc_type_raw == "listing_description":
+                            badge_color = "#29B5E8"
+                            badge_bg = "rgba(41, 181, 232, 0.12)"
+                        else:
+                            badge_color = "#FFA726"
+                            badge_bg = "rgba(255, 167, 38, 0.12)"
+
+                        type_label = doc_type_raw.replace("_", " ").upper()
+
+                        st.markdown(f"""
+                        <div style="background: #1A1B1E; border: 1px solid #282A2F; border-radius: 12px; padding: 14px 18px; margin-bottom: 12px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                <div style="font-weight: 700; color: #FFFFFF; font-size: 0.92rem;">
+                                    <span style="color: #B4F73E; margin-right: 6px;">#{src['rank']}</span> {src['title']}
+                                </div>
+                                <div style="background: {badge_bg}; color: {badge_color}; border: 1px solid {badge_color}44; border-radius: 10px; padding: 2px 8px; font-size: 0.70rem; font-weight: 700;">
+                                    {type_label}
+                                </div>
+                            </div>
+                            <div style="font-size: 0.76rem; color: #8E929A; margin-bottom: 8px;">
+                                City: <strong style="color: #FFFFFF;">{src['city']}</strong> | 
+                                Locality: <strong style="color: #FFFFFF;">{src['locality']}</strong> | 
+                                MMR Score: <strong style="color: #B4F73E;">{src['similarity_score']:.4f}</strong> | 
+                                Source: <code>{src['source']}</code>
+                            </div>
+                            <div style="background: #111214; border-radius: 6px; padding: 10px 12px; font-size: 0.80rem; color: #CCCCCC; line-height: 1.5; border: 1px solid #23252A;">
+                                {src['document']}
+                            </div>
+                        </div>
+                        """, unsafe_allow_html=True)
+
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    # --------------------------------------------------------------------------
+    # MODE 2: Structured Text-to-SQL Analytics (DuckDB / Snowflake)
+    # --------------------------------------------------------------------------
+    else:
+        st.markdown("""
+        <div class="dark-card">
+            <div style="font-size: 1.15rem; font-weight: 700; color: #FFFFFF; margin-bottom: 6px;">Structured Star Schema Text-to-SQL Engine</div>
+            <div style="font-size: 0.82rem; color: #8E929A; margin-bottom: 16px;">
+                Translates analytical questions into executable SQL against Kimball Star Schema fact and dimension tables on DuckDB or Snowflake.
+            </div>
+        """, unsafe_allow_html=True)
+
+        col_q, col_be = st.columns([3, 1])
+        with col_q:
+            q_text = st.text_input(
+                "Analytical Question",
+                value="Which 2BHK areas in Noida have the best rental yield?"
+            )
+        with col_be:
+            be_option = st.selectbox(
+                "Warehouse Backend",
+                ["DuckDB (Local Columnar)", "Snowflake (Cloud DW)"]
+            )
+        
+        target_backend = "snowflake" if "Snowflake" in be_option else "duckdb"
+
+        if st.button("Execute SQL Analytics Query"):
+            with st.spinner(f"Executing Text-to-SQL translation and querying {be_option}..."):
+                asst = PropIQAssistant(DUCKDB_PATH, DOCS_DIR)
+                ans_pkg = asst.answer_query(q_text, warehouse_backend=target_backend)
+
+                st.markdown(ans_pkg["answer"])
+
+                if ans_pkg["sql_query"]:
+                    with st.expander("Underlying SQL Executed on Star Schema"):
+                        st.code(ans_pkg["sql_query"], language="sql")
+
+                if ans_pkg["citations"]:
+                    with st.expander("Knowledge Base Document Citations"):
+                        for c in ans_pkg["citations"]:
+                            st.markdown(f"- {c}")
+
+        st.markdown('</div>', unsafe_allow_html=True)
 
 # ==============================================================================
 # VIEW 5: Star Schema & DW

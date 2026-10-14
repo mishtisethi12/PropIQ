@@ -1,32 +1,29 @@
 project:
-  name: "PropIQ"
-  version: "1.0.0"
-  description: "End-to-End Real Estate Data Platform with a GenAI Assistant"
-
+  name: PropIQ
+  version: 1.0.0
+  description: End-to-End Real Estate Data Platform with a GenAI Assistant
 storage:
-  raw_dir: "data/raw"
-  staging_dir: "data/staging"
-  warehouse_dir: "data/warehouse"
-  duckdb_path: "data/warehouse/propiq_warehouse.duckdb"
-  postgres_url: "postgresql+psycopg2://postgres:postgrespassword@localhost:5432/propiq_db"
-  sqlite_raw_path: "data/raw/propiq_raw_oltp.db"
-
+  raw_dir: data/raw
+  staging_dir: data/staging
+  warehouse_dir: data/warehouse
+  duckdb_path: data/warehouse/propiq_warehouse.duckdb
+  postgres_url: postgresql+psycopg2://postgres:postgrespassword@localhost:5432/propiq_db
+  sqlite_raw_path: data/raw/propiq_raw_oltp.db
 ingestion:
   csv_sources:
-    - name: "Portal_Alpha"
-      path: "data/raw/csv_sources/portal_alpha_listings.csv"
-      format: "standard"
-    - name: "Portal_Beta"
-      path: "data/raw/csv_sources/portal_beta_listings.csv"
-      format: "messy"
+  - name: Portal_Alpha
+    path: data/raw/csv_sources/portal_alpha_listings.csv
+    format: standard
+  - name: Portal_Beta
+    path: data/raw/csv_sources/portal_beta_listings.csv
+    format: messy
   api_config:
-    endpoint_mock_file: "data/raw/api_responses/locality_infrastructure.json"
+    endpoint_mock_file: data/raw/api_responses/locality_infrastructure.json
     rate_limit_per_sec: 10
     timeout_seconds: 5
   scraper_config:
-    unstructured_html_dir: "data/raw/scraped_text"
-    docs_dir: "data/docs"
-
+    unstructured_html_dir: data/raw/scraped_text
+    docs_dir: data/docs
 cleaning:
   deduplication:
     fuzzy_title_threshold: 0.85
@@ -38,55 +35,55 @@ cleaning:
     max_carpet_area_sqft: 15000
     min_price_inr: 500000
     max_price_inr: 500000000
-
 warehouse:
   star_schema:
-    fact_table: "fact_property_listings"
-    dim_location: "dim_location"
-    dim_property_type: "dim_property_type"
-    dim_amenities: "dim_amenities"
-    dim_date: "dim_date"
+    fact_table: fact_property_listings
+    dim_location: dim_location
+    dim_property_type: dim_property_type
+    dim_amenities: dim_amenities
+    dim_date: dim_date
   partitioning:
-    partition_column: "city"
-    supported_cities: ["Noida", "Greater Noida", "Gurgaon", "Delhi", "Bangalore"]
-    date_partition: "month"
-
+    partition_column: city
+    supported_cities:
+    - Noida
+    - Greater Noida
+    - Gurgaon
+    - Delhi
+    - Bangalore
+    date_partition: month
 ml:
-  target_column: "price_inr"
+  target_column: price_inr
   features:
-    - "carpet_area_sqft"
-    - "bhk_count"
-    - "bathrooms"
-    - "balconies"
-    - "parking"
-    - "gym"
-    - "swimming_pool"
-    - "transit_score"
-    - "safety_rating"
-    - "school_score"
-    - "is_furnished"
-    - "age_of_property_years"
+  - carpet_area_sqft
+  - bhk_count
+  - bathrooms
+  - balconies
+  - parking
+  - gym
+  - swimming_pool
+  - transit_score
+  - safety_rating
+  - school_score
+  - is_furnished
+  - age_of_property_years
   test_size: 0.2
   random_state: 42
   models:
-    - "decision_forest"
-    - "xgboost"
-    - "knn"
-    - "ridge"
-
+  - decision_forest
+  - xgboost
+  - knn
+  - ridge
 rag:
   chunk_size: 500
   chunk_overlap: 50
   top_k: 4
   vector_dim: 128
-  model_provider: "gemini_with_fallback"
-
+  model_provider: gemini_with_fallback
 snowflake:
-  account: ""             # e.g., 'xy12345.ap-south-1' or 'ORGNAME-ACCOUNTNAME'
-  user: ""                # Your Snowflake username
-  password: ""            # Or set via SNOWFLAKE_PASSWORD env var
-  role: "ACCOUNTADMIN"
-  warehouse: "PROPIQ_WH"
-  database: "PROPIQ_DW"
-  schema: "CORE_STAR_SCHEMA"
-
+  account: ''
+  user: ''
+  password: ''
+  role: ACCOUNTADMIN
+  warehouse: PROPIQ_WH
+  database: PROPIQ_DW
+  schema: CORE_STAR_SCHEMA
