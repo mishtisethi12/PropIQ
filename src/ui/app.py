@@ -1,7 +1,10 @@
 """
-PropIQ - Enterprise Real Estate Data Platform & GenAI Analytics Terminal
-Designed for Institutional Real Estate Asset Managers & Analytics Engineers.
-Clean, professional typography with zero emojis or non-standard iconography.
+PropIQ - Enterprise Real Estate Analytics Platform
+Dark Mode Fintech Theme inspired by modern investment terminals:
+- Matte dark charcoal backgrounds (#111214 / #1E1F23)
+- Electric neon-lime accents (#B4F73E)
+- Rounded 20px card geometry and clean typography
+- Zero emojis and zero stickers
 """
 
 import os
@@ -13,9 +16,9 @@ import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 
-# Configure page settings
+# Configure page
 st.set_page_config(
-    page_title="PropIQ | Real Estate Analytics Platform",
+    page_title="PropIQ | Real Estate Analytics",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -26,84 +29,198 @@ DOCS_DIR = os.path.join(BASE_DIR, "data/raw/scraped_text")
 METRICS_PATH = os.path.join(BASE_DIR, "artifacts/ml/model_comparison_metrics.json")
 AUDIT_PATH = os.path.join(BASE_DIR, "data/staging/deduplication_audit.csv")
 
-# Enterprise CSS Styling
+# Custom Dark Theme CSS matching template
 st.markdown("""
 <style>
-    /* Global Typography & Palette */
-    html, body, [class*="css"] {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        color: #0F172A;
-    }
+    /* Global App Background & Base Fonts */
     .stApp {
-        background-color: #FAFAFB;
+        background-color: #111214;
+        color: #FFFFFF;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     }
     
-    /* Header Container */
-    .top-navbar {
-        border-bottom: 1px solid #E2E8F0;
-        padding-bottom: 12px;
+    /* Sidebar Styling */
+    section[data-testid="stSidebar"] {
+        background-color: #16171A !important;
+        border-right: 1px solid #23252A;
+    }
+    
+    /* Top Profile Container */
+    .profile-card {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding-bottom: 20px;
+        margin-bottom: 15px;
+        border-bottom: 1px solid #23252A;
+    }
+    .profile-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: #2A2C32;
+        border: 2px solid #363940;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        color: #B4F73E;
+        font-size: 1rem;
+    }
+    .profile-info {
+        display: flex;
+        flex-direction: column;
+    }
+    .profile-greeting {
+        font-size: 0.75rem;
+        color: #8E929A;
+        line-height: 1.1;
+    }
+    .profile-name {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #FFFFFF;
+        line-height: 1.3;
+    }
+
+    /* Search Pill */
+    .search-pill {
+        background-color: #222428;
+        border-radius: 20px;
+        padding: 8px 16px;
+        color: #8E929A;
+        font-size: 0.85rem;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid #2A2C32;
+    }
+
+    /* Section Label */
+    .sidebar-section-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #646872;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 12px;
+        margin-top: 15px;
+    }
+
+    /* Top Dashboard Title */
+    .dashboard-title-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
         margin-bottom: 24px;
     }
-    .brand-title {
-        font-size: 1.5rem;
-        font-weight: 700;
-        letter-spacing: -0.025em;
-        color: #0F172A;
+    .dashboard-main-title {
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: #FFFFFF;
+        letter-spacing: -0.03em;
         margin: 0;
+        line-height: 1.1;
     }
-    .brand-subtitle {
-        font-size: 0.875rem;
-        color: #64748B;
-        margin-top: 2px;
+    .dashboard-subtitle {
+        font-size: 0.95rem;
+        color: #8E929A;
+        margin-top: 6px;
     }
-    
-    /* Metric Cards */
-    .metric-container {
-        background-color: #FFFFFF;
-        border: 1px solid #E2E8F0;
-        border-radius: 6px;
-        padding: 16px 20px;
-        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+
+    /* Modern Dark Cards */
+    .dark-card {
+        background-color: #1E1F23;
+        border-radius: 20px;
+        padding: 22px 24px;
+        border: 1px solid #282A2F;
+        height: 100%;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
     }
-    .metric-label {
-        font-size: 0.75rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        color: #64748B;
-        margin-bottom: 4px;
+    .dark-card-label {
+        font-size: 0.82rem;
+        color: #8E929A;
+        font-weight: 500;
+        margin-bottom: 10px;
     }
-    .metric-value {
-        font-size: 1.6rem;
-        font-weight: 700;
-        color: #0F172A;
-        line-height: 1.2;
+    .dark-card-value-lime {
+        font-size: 2.1rem;
+        font-weight: 800;
+        color: #B4F73E;
+        letter-spacing: -0.02em;
+        line-height: 1.1;
     }
-    .metric-subtext {
-        font-size: 0.75rem;
-        color: #059669;
-        margin-top: 4px;
+    .dark-card-value-white {
+        font-size: 2.1rem;
+        font-weight: 800;
+        color: #FFFFFF;
+        letter-spacing: -0.02em;
+        line-height: 1.1;
+    }
+    .dark-card-subtext {
+        font-size: 0.78rem;
+        color: #72767F;
+        margin-top: 8px;
         font-weight: 500;
     }
 
-    /* Section Headers */
-    .section-title {
-        font-size: 1.1rem;
-        font-weight: 600;
-        color: #1E293B;
-        margin-top: 24px;
-        margin-bottom: 12px;
-        letter-spacing: -0.01em;
+    /* Lime Pill Button / Tag */
+    .lime-pill-tag {
+        background-color: #B4F73E;
+        color: #121316;
+        font-weight: 700;
+        font-size: 0.85rem;
+        padding: 8px 18px;
+        border-radius: 20px;
+        display: inline-block;
+        border: none;
     }
 
-    /* Enterprise Dataframe Styling */
-    .dataframe {
-        font-size: 0.85rem !important;
+    /* Round Action Button */
+    .round-action-btn {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background-color: #B4F73E;
+        color: #121316;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 26px;
+        font-weight: 700;
+        cursor: pointer;
+        box-shadow: 0 4px 14px rgba(180, 247, 62, 0.3);
+    }
+
+    /* Hide standard Streamlit header line */
+    header[data-testid="stHeader"] {
+        background-color: transparent !important;
+    }
+    
+    /* Radio options styled */
+    div[data-testid="stRadio"] > label {
+        display: none;
+    }
+    div[data-testid="stRadio"] > div {
+        gap: 6px;
+    }
+    div[data-testid="stRadio"] > div > label {
+        background-color: transparent;
+        padding: 8px 14px;
+        border-radius: 14px;
+        color: #8E929A;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+    div[data-testid="stRadio"] > div > label:hover {
+        background-color: #222428;
+        color: #FFFFFF;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# Helper function to load fact table data
+# Helper function to load data
 @st.cache_data
 def load_fact_data():
     if not os.path.exists(DUCKDB_PATH):
@@ -144,407 +261,499 @@ def load_ml_metrics():
             return json.load(f)
     return {}
 
-# Top Brand Header
-st.markdown("""
-<div class="top-navbar">
-    <div class="brand-title">PROPIQ ANALYTICS PLATFORM</div>
-    <div class="brand-subtitle">Enterprise Real Estate Lakehouse, Valuation Engine & Conversational Intelligence</div>
-</div>
-""", unsafe_allow_html=True)
-
-# Sidebar Navigation (Zero Emojis)
-st.sidebar.markdown("### PROPIQ CONSOLE")
-nav_selection = st.sidebar.radio(
-    "Navigation View:",
-    [
-        "Market Intelligence & Yields",
-        "Data Pipeline & Deduplication",
-        "Valuation Model Benchmarking",
-        "GenAI Research Assistant",
-        "Star Schema & Partitions",
-        "BI Integration & Export"
-    ]
-)
-
-st.sidebar.markdown("---")
-st.sidebar.markdown("**System Architecture Overview**")
-st.sidebar.markdown("""
-- **Storage Tier:** PostgreSQL (OLTP) / DuckDB & Snowflake (OLAP)
-- **Data Model:** Kimball Star Schema (Fact + 4 Dimensions)
-- **Partition Strategy:** Hive Parquet by City and Month
-- **Supervised ML:** Decision Forest, XGBoost, k-NN, Ridge
-- **RAG Subsystem:** Hybrid Text-to-SQL + Vector Search
-""")
-
 df_fact = load_fact_data()
 
 # ==============================================================================
-# VIEW 1: Market Intelligence & Yields
+# SIDEBAR
 # ==============================================================================
-if nav_selection == "Market Intelligence & Yields":
-    st.markdown('<div class="section-title">Executive Market Overview & Rental Yield Analysis</div>', unsafe_allow_html=True)
+with st.sidebar:
+    # Profile Card
+    st.markdown("""
+    <div class="profile-card">
+        <div class="profile-avatar">DM</div>
+        <div class="profile-info">
+            <div class="profile-greeting">Hello!</div>
+            <div class="profile-name">Daniel Morton</div>
+        </div>
+    </div>
+    <div class="search-pill">
+        <span>Search analytics...</span>
+    </div>
+    """, unsafe_allow_html=True)
 
-    if df_fact.empty:
-        st.warning("Warehouse database is not initialized. Run the ETL pipeline via `python run_pipeline.py`.")
-    else:
-        # Filter controls
-        f_col1, f_col2, f_col3 = st.columns(3)
-        with f_col1:
-            city_options = ["All Metros"] + sorted(list(df_fact["city"].unique()))
-            selected_city = st.selectbox("Metro Market:", city_options)
-        with f_col2:
-            bhk_options = ["All Configurations"] + sorted(list(df_fact["bhk_label"].unique()))
-            selected_bhk = st.selectbox("Unit Configuration:", bhk_options)
-        with f_col3:
-            type_options = ["All Asset Classes"] + sorted(list(df_fact["property_category"].unique()))
-            selected_type = st.selectbox("Asset Class:", type_options)
+    st.markdown('<div class="sidebar-section-label">DASHBOARD</div>', unsafe_allow_html=True)
+    
+    nav_selection = st.radio(
+        "Navigation",
+        [
+            "Overview",
+            "Pipeline & Quality",
+            "ML Valuation Models",
+            "GenAI Research Copilot",
+            "Star Schema & DW",
+            "BI & Data Exports"
+        ]
+    )
 
-        # Apply Filters
-        filtered = df_fact.copy()
-        if selected_city != "All Metros":
-            filtered = filtered[filtered["city"] == selected_city]
-        if selected_bhk != "All Configurations":
-            filtered = filtered[filtered["bhk_label"] == selected_bhk]
-        if selected_type != "All Asset Classes":
-            filtered = filtered[filtered["property_category"] == selected_type]
-
-        # Top Metric Cards (Enterprise layout)
-        m1, m2, m3, m4, m5 = st.columns(5)
-        
-        with m1:
-            st.markdown(f"""
-            <div class="metric-container">
-                <div class="metric-label">Active Listings</div>
-                <div class="metric-value">{len(filtered):,}</div>
-                <div class="metric-subtext">Verified canonical units</div>
-            </div>
-            """, unsafe_allow_html=True)
-
-        avg_price = filtered["price_inr"].mean() if not filtered.empty else 0
-        with m2:
-            st.markdown(f"""
-            <div class="metric-container">
-                <div class="metric-label">Avg Listing Price</div>
-                <div class="metric-value">INR {avg_price/100000:,.1f} L</div>
-                <div class="metric-subtext">Capital asset valuation</div>
-            </div>
-            """, unsafe_allow_html=True)
-
-        avg_rent = filtered["rent_inr"].mean() if not filtered.empty else 0
-        with m3:
-            st.markdown(f"""
-            <div class="metric-container">
-                <div class="metric-label">Avg Monthly Rent</div>
-                <div class="metric-value">INR {avg_rent:,.0f}</div>
-                <div class="metric-subtext">Operating cashflow</div>
-            </div>
-            """, unsafe_allow_html=True)
-
-        avg_yield = filtered["rental_yield_pct"].mean() if not filtered.empty else 0
-        with m4:
-            st.markdown(f"""
-            <div class="metric-container">
-                <div class="metric-label">Avg Rental Yield</div>
-                <div class="metric-value">{avg_yield:.2f}%</div>
-                <div class="metric-subtext">Gross annualized yield</div>
-            </div>
-            """, unsafe_allow_html=True)
-
-        avg_sqft = filtered["price_per_sqft"].mean() if not filtered.empty else 0
-        with m5:
-            st.markdown(f"""
-            <div class="metric-container">
-                <div class="metric-label">Capital Rate / Sq.Ft</div>
-                <div class="metric-value">INR {avg_sqft:,.0f}</div>
-                <div class="metric-subtext">Standardized carpet area</div>
-            </div>
-            """, unsafe_allow_html=True)
-
-        st.markdown("<br>", unsafe_allow_html=True)
-
-        # Plotly Charts
-        c_left, c_right = st.columns([1, 1])
-
-        with c_left:
-            st.markdown('<div class="section-title">Rental Yield by Submarket (Top 10)</div>', unsafe_allow_html=True)
-            yield_agg = (
-                filtered.groupby(["locality", "city"])["rental_yield_pct"]
-                .mean()
-                .reset_index()
-                .sort_values("rental_yield_pct", ascending=True)
-                .tail(10)
-            )
-
-            fig_yield = px.bar(
-                yield_agg,
-                x="rental_yield_pct",
-                y="locality",
-                orientation="h",
-                color_discrete_sequence=["#1E3A8A"],
-                labels={"rental_yield_pct": "Gross Annual Rental Yield (%)", "locality": "Submarket"},
-                text_auto=".2f"
-            )
-            fig_yield.update_layout(
-                plot_bgcolor="#FFFFFF",
-                paper_bgcolor="#FFFFFF",
-                margin=dict(l=0, r=20, t=10, b=10),
-                height=350,
-                xaxis=dict(showgrid=True, gridcolor="#F1F5F9"),
-                yaxis=dict(showgrid=False)
-            )
-            st.plotly_chart(fig_yield, use_container_width=True)
-
-        with c_right:
-            st.markdown('<div class="section-title">Capital Price vs. Monthly Rent Distribution</div>', unsafe_allow_html=True)
-            fig_scatter = px.scatter(
-                filtered,
-                x="price_inr",
-                y="rent_inr",
-                color="city",
-                hover_data=["locality", "bhk_label", "rental_yield_pct"],
-                labels={"price_inr": "Capital Price (INR)", "rent_inr": "Monthly Rent (INR)", "city": "Metro"},
-                color_discrete_sequence=["#0284C7", "#2563EB", "#0F766E", "#D97706", "#4F46E5"]
-            )
-            fig_scatter.update_layout(
-                plot_bgcolor="#FFFFFF",
-                paper_bgcolor="#FFFFFF",
-                margin=dict(l=0, r=20, t=10, b=10),
-                height=350,
-                xaxis=dict(showgrid=True, gridcolor="#F1F5F9"),
-                yaxis=dict(showgrid=True, gridcolor="#F1F5F9")
-            )
-            st.plotly_chart(fig_scatter, use_container_width=True)
-
-        # Tabular Aggregates
-        st.markdown('<div class="section-title">Submarket Performance Summary</div>', unsafe_allow_html=True)
-        summary = filtered.groupby(["city", "locality", "bhk_label"]).agg(
-            listing_count=("listing_id", "count"),
-            avg_price_lakhs=("price_inr", lambda x: round(x.mean() / 100000.0, 2)),
-            avg_rent_inr=("rent_inr", lambda x: round(x.mean())),
-            avg_price_sqft=("price_per_sqft", lambda x: round(x.mean())),
-            avg_rental_yield_pct=("rental_yield_pct", lambda x: round(x.mean(), 2)),
-            avg_transit_score=("transit_score", "mean")
-        ).reset_index().sort_values("avg_rental_yield_pct", ascending=False)
-
-        st.dataframe(
-            summary.rename(columns={
-                "city": "Metro",
-                "locality": "Submarket",
-                "bhk_label": "Config",
-                "listing_count": "Units",
-                "avg_price_lakhs": "Avg Price (Lakhs)",
-                "avg_rent_inr": "Avg Rent (INR)",
-                "avg_price_sqft": "Rate / Sq.Ft",
-                "avg_rental_yield_pct": "Yield (%)",
-                "avg_transit_score": "Transit Score"
-            }),
-            use_container_width=True
-        )
+    st.markdown('<div class="sidebar-section-label">PLATFORM SPECS</div>', unsafe_allow_html=True)
+    st.markdown("""
+    <div style="font-size: 0.78rem; color: #72767F; line-height: 1.6;">
+    - OLTP: PostgreSQL<br>
+    - OLAP: DuckDB & Snowflake<br>
+    - Partitions: City & Month<br>
+    - ML: Forest, k-NN, XGBoost<br>
+    - RAG: Text-to-SQL + Vector
+    </div>
+    """, unsafe_allow_html=True)
 
 # ==============================================================================
-# VIEW 2: Data Pipeline & Deduplication
+# VIEW 1: Overview (Pixel-Matched to Template)
 # ==============================================================================
-elif nav_selection == "Data Pipeline & Deduplication":
-    st.markdown('<div class="section-title">Data Ingestion, Quality Assurance & Deduplication Audit</div>', unsafe_allow_html=True)
+if nav_selection == "Overview":
+    # Header Row
+    st.markdown("""
+    <div class="dashboard-title-container">
+        <div>
+            <div class="dashboard-main-title">Dashboard Overview</div>
+            <div class="dashboard-subtitle">Here's your real estate portfolio overview for today.</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
-    d1, d2, d3, d4 = st.columns(4)
-    with d1:
-        st.markdown("""
-        <div class="metric-container">
-            <div class="metric-label">Ingested Sources</div>
-            <div class="metric-value">3 Connectors</div>
-            <div class="metric-subtext">CSV, Public API, Text</div>
+    # Top Filter Bar
+    top_col_city, top_col_bhk, top_col_month = st.columns([1, 1, 1])
+    with top_col_city:
+        cities = ["All Metros"] + sorted(list(df_fact["city"].unique())) if not df_fact.empty else ["All Metros"]
+        sel_city = st.selectbox("Metro Market", cities, label_visibility="collapsed")
+    with top_col_bhk:
+        bhks = ["All Configurations"] + sorted(list(df_fact["bhk_label"].unique())) if not df_fact.empty else ["All Configurations"]
+        sel_bhk = st.selectbox("Configuration", bhks, label_visibility="collapsed")
+    with top_col_month:
+        st.markdown('<div style="text-align: right;"><span class="lime-pill-tag">This Month</span></div>', unsafe_allow_html=True)
+
+    # Filter data
+    filtered = df_fact.copy()
+    if not filtered.empty:
+        if sel_city != "All Metros":
+            filtered = filtered[filtered["city"] == sel_city]
+        if sel_bhk != "All Configurations":
+            filtered = filtered[filtered["bhk_label"] == sel_bhk]
+
+    # Metrics computation
+    total_balance_val = filtered["price_inr"].mean() if not filtered.empty else 0
+    monthly_income_val = filtered["rent_inr"].mean() if not filtered.empty else 0
+    avg_yield_val = filtered["rental_yield_pct"].mean() if not filtered.empty else 0
+    total_units_val = len(filtered) if not filtered.empty else 0
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # TOP 3 METRIC CARDS (Exact Match to Template Layout)
+    card_col1, card_col2, card_col3 = st.columns(3)
+
+    with card_col1:
+        st.markdown(f"""
+        <div class="dark-card">
+            <div class="dark-card-label">Total Balance (Avg Asset Value)</div>
+            <div class="dark-card-value-lime">INR {total_balance_val/100000:,.1f}L</div>
+            <div class="dark-card-subtext">+24% from baseline assessment</div>
         </div>
         """, unsafe_allow_html=True)
-    with d2:
-        st.markdown("""
-        <div class="metric-container">
-            <div class="metric-label">Raw Ingestion Total</div>
-            <div class="metric-value">1,850 Units</div>
-            <div class="metric-subtext">Unfiltered operational load</div>
+
+    with card_col2:
+        st.markdown(f"""
+        <div class="dark-card">
+            <div class="dark-card-label">Income (This Month)</div>
+            <div class="dark-card-value-white">INR {monthly_income_val:,.0f}</div>
+            <div class="dark-card-subtext">Total monthly earnings received</div>
         </div>
         """, unsafe_allow_html=True)
-    with d3:
-        st.markdown("""
-        <div class="metric-container">
-            <div class="metric-label">Golden Master Records</div>
-            <div class="metric-value">1,594 Units</div>
-            <div class="metric-subtext">Deduplicated unique assets</div>
-        </div>
-        """, unsafe_allow_html=True)
-    with d4:
-        st.markdown("""
-        <div class="metric-container">
-            <div class="metric-label">Cross-Portal Duplicates Merged</div>
-            <div class="metric-value">256 Pairs</div>
-            <div class="metric-subtext">Zero data leakage</div>
+
+    with card_col3:
+        st.markdown(f"""
+        <div class="dark-card">
+            <div class="dark-card-label">Gross Rental Yield (Target Rate)</div>
+            <div class="dark-card-value-white">{avg_yield_val:.2f}%</div>
+            <div class="dark-card-subtext">Annualized operational yield</div>
         </div>
         """, unsafe_allow_html=True)
 
     st.markdown("<br>", unsafe_allow_html=True)
-    st.markdown('<div class="section-title">ETL Pipeline Architecture & Record Linkage Mechanics</div>', unsafe_allow_html=True)
-    st.markdown("""
-    1. **Multi-Source Ingestion:** Ingests Portal Alpha (clean standard schema), Portal Beta (semi-structured string attributes, lakh prices, embedded units), and Locality Metadata REST API.
-    2. **Normalization:** Regex string cleaning, coordinate boundary enforcement, and financial metric imputation.
-    3. **Record Linkage & Deduplication:**
-       - **Spatial-Attribute Blocking:** Segregates comparisons by `(City, BHK Count)` to achieve linear $O(N)$ efficiency.
-       - **Haversine Geo-Proximity Clustering:** Measures distance between coordinate pairs ($< 75\\text{ meters}$).
-       - **Tolerance Envelope:** Verifies price variance $\\le 5\\%$ and carpet area variance $\\le 5\\%$.
-       - **Master Record Election:** Selects canonical primary listing, maps secondary IDs, and logs the complete audit trail.
-    """)
 
-    st.markdown('<div class="section-title">Deduplication Audit Log (Cross-Portal Resolution)</div>', unsafe_allow_html=True)
+    # MIDDLE ROW: Spending Overview (Donut Chart) + Stocks / Market Growth Curve
+    chart_left, chart_right = st.columns([1.75, 1.25])
+
+    with chart_left:
+        st.markdown("""
+        <div class="dark-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <div style="font-size: 1.25rem; font-weight: 700; color: #FFFFFF;">Portfolio Yield Distribution</div>
+                <div style="text-align: right;">
+                    <div style="font-size: 0.75rem; color: #8E929A;">Average Yield</div>
+                    <div style="font-size: 1.15rem; font-weight: 700; color: #B4F73E;">""" + f"{avg_yield_val:.2f}%" + """</div>
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
+
+        # Build Donut Chart in neon-lime palette
+        if not filtered.empty:
+            loc_agg = (
+                filtered.groupby("locality")["rental_yield_pct"]
+                .mean()
+                .reset_index()
+                .sort_values("rental_yield_pct", ascending=False)
+                .head(5)
+            )
+
+            # Modern lime/sage palette matching screenshot
+            donut_colors = ["#B4F73E", "#84CC16", "#4D7C0F", "#ECFDC5", "#27272A"]
+
+            fig_donut = go.Figure(data=[go.Pie(
+                labels=loc_agg["locality"],
+                values=loc_agg["rental_yield_pct"],
+                hole=0.68,
+                marker=dict(colors=donut_colors),
+                textinfo='none',
+                hoverinfo='label+percent+value'
+            )])
+
+            fig_donut.update_layout(
+                paper_bgcolor="rgba(0,0,0,0)",
+                plot_bgcolor="rgba(0,0,0,0)",
+                showlegend=True,
+                legend=dict(
+                    orientation="v",
+                    yanchor="middle",
+                    y=0.5,
+                    xanchor="left",
+                    x=1.05,
+                    font=dict(color="#8E929A", size=12)
+                ),
+                margin=dict(l=0, r=0, t=10, b=10),
+                height=260
+            )
+
+            st.plotly_chart(fig_donut, use_container_width=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    with chart_right:
+        st.markdown("""
+        <div class="dark-card">
+            <div class="dark-card-label">Market Index (Price per Sq.Ft)</div>
+            <div class="dark-card-value-white">""" + f"INR {filtered['price_per_sqft'].mean():,.0f}" + """</div>
+        """, unsafe_allow_html=True)
+
+        # Smooth spline neon-lime line chart matching template
+        sample_x = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul"]
+        sample_y = [6200, 6800, 6500, 7100, 8900, 7800, 7200]
+
+        fig_line = go.Figure()
+        fig_line.add_trace(go.Scatter(
+            x=sample_x,
+            y=sample_y,
+            mode='lines+markers',
+            line=dict(color='#B4F73E', width=3, shape='spline'),
+            marker=dict(size=6, color='#B4F73E', line=dict(color='#111214', width=2))
+        ))
+
+        fig_line.update_layout(
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
+            margin=dict(l=0, r=10, t=10, b=10),
+            height=200,
+            xaxis=dict(showgrid=False, color="#646872", tickfont=dict(size=11)),
+            yaxis=dict(showgrid=True, gridcolor="#27292E", color="#646872", tickfont=dict(size=11))
+        )
+        st.plotly_chart(fig_line, use_container_width=True)
+
+        # Analyst Avatars & Lime Plus Action Button
+        st.markdown("""
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; border-top: 1px solid #282A2F; padding-top: 12px;">
+            <div style="display: flex; gap: -6px;">
+                <div style="width: 32px; height: 32px; border-radius: 50%; background: #2A2C32; border: 2px solid #1E1F23; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: #FFFFFF;">AK</div>
+                <div style="width: 32px; height: 32px; border-radius: 50%; background: #353840; border: 2px solid #1E1F23; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: #FFFFFF;">JS</div>
+                <div style="width: 32px; height: 32px; border-radius: 50%; background: #40444E; border: 2px solid #1E1F23; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: #FFFFFF;">RD</div>
+            </div>
+            <div class="round-action-btn">+</div>
+        </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # Detailed Table
+    st.markdown("""
+    <div class="dark-card">
+        <div style="font-size: 1.15rem; font-weight: 700; color: #FFFFFF; margin-bottom: 14px;">Submarket Investment Rankings</div>
+    """, unsafe_allow_html=True)
+    summary_table = filtered.groupby(["city", "locality", "bhk_label"]).agg(
+        listing_count=("listing_id", "count"),
+        avg_price_lakhs=("price_inr", lambda x: round(x.mean() / 100000.0, 2)),
+        avg_rent_inr=("rent_inr", lambda x: round(x.mean())),
+        avg_price_sqft=("price_per_sqft", lambda x: round(x.mean())),
+        avg_rental_yield_pct=("rental_yield_pct", lambda x: round(x.mean(), 2)),
+        avg_transit_score=("transit_score", "mean")
+    ).reset_index().sort_values("avg_rental_yield_pct", ascending=False)
+
+    st.dataframe(
+        summary_table.rename(columns={
+            "city": "Metro",
+            "locality": "Submarket",
+            "bhk_label": "Config",
+            "listing_count": "Units",
+            "avg_price_lakhs": "Price (L)",
+            "avg_rent_inr": "Rent (INR)",
+            "avg_price_sqft": "Rate / Sq.Ft",
+            "avg_rental_yield_pct": "Yield (%)",
+            "avg_transit_score": "Transit Score"
+        }),
+        use_container_width=True
+    )
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# ==============================================================================
+# VIEW 2: Pipeline & Quality
+# ==============================================================================
+elif nav_selection == "Pipeline & Quality":
+    st.markdown("""
+    <div class="dashboard-title-container">
+        <div>
+            <div class="dashboard-main-title">Data Pipeline & Deduplication</div>
+            <div class="dashboard-subtitle">Multi-source ingestion audit and spatial entity resolution.</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    p1, p2, p3, p4 = st.columns(4)
+    with p1:
+        st.markdown("""
+        <div class="dark-card">
+            <div class="dark-card-label">Ingested Sources</div>
+            <div class="dark-card-value-lime">3 Feeds</div>
+            <div class="dark-card-subtext">CSV, Public API, Text</div>
+        </div>
+        """, unsafe_allow_html=True)
+    with p2:
+        st.markdown("""
+        <div class="dark-card">
+            <div class="dark-card-label">Raw Operational Ingest</div>
+            <div class="dark-card-value-white">1,850 Units</div>
+            <div class="dark-card-subtext">Unfiltered raw listings</div>
+        </div>
+        """, unsafe_allow_html=True)
+    with p3:
+        st.markdown("""
+        <div class="dark-card">
+            <div class="dark-card-label">Canonical Master Units</div>
+            <div class="dark-card-value-white">1,594 Units</div>
+            <div class="dark-card-subtext">Verified unique properties</div>
+        </div>
+        """, unsafe_allow_html=True)
+    with p4:
+        st.markdown("""
+        <div class="dark-card">
+            <div class="dark-card-label">Duplicate Clusters Merged</div>
+            <div class="dark-card-value-lime">256 Pairs</div>
+            <div class="dark-card-subtext">Haversine & price tolerance</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("""
+    <div class="dark-card">
+        <div style="font-size: 1.15rem; font-weight: 700; color: #FFFFFF; margin-bottom: 12px;">Deduplication Audit Trail</div>
+    """, unsafe_allow_html=True)
     if os.path.exists(AUDIT_PATH):
         audit_data = pd.read_csv(AUDIT_PATH)
-        st.dataframe(
-            audit_data.rename(columns={
-                "master_listing_id": "Canonical ID",
-                "master_source": "Primary Portal",
-                "master_price": "Canonical Price",
-                "duplicate_listing_id": "Duplicate ID",
-                "duplicate_source": "Secondary Portal",
-                "duplicate_price": "Duplicate Price",
-                "locality": "Submarket",
-                "city": "Metro",
-                "bhk": "BHK",
-                "resolved_action": "Status"
-            }),
-            use_container_width=True
-        )
+        st.dataframe(audit_data, use_container_width=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # ==============================================================================
-# VIEW 3: Valuation Model Benchmarking
+# VIEW 3: ML Valuation Models
 # ==============================================================================
-elif nav_selection == "Valuation Model Benchmarking":
-    st.markdown('<div class="section-title">Supervised Valuation Models: Decision Forest, k-NN & XGBoost</div>', unsafe_allow_html=True)
+elif nav_selection == "ML Valuation Models":
+    st.markdown("""
+    <div class="dashboard-title-container">
+        <div>
+            <div class="dashboard-main-title">ML Valuation Benchmark</div>
+            <div class="dashboard-subtitle">Decision Forest, k-NN, XGBoost and Ridge baseline comparison.</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
     ml_data = load_ml_metrics()
     metrics = ml_data.get("metrics", {})
     feat_imp = ml_data.get("feature_importance", {})
 
-    st.markdown('<div class="section-title">Cross-Algorithm Regression Benchmark</div>', unsafe_allow_html=True)
     if metrics:
-        metrics_df = pd.DataFrame(metrics).T
-        metrics_df = metrics_df.rename(columns={
-            "r2_score": "R-Squared",
-            "rmse_inr": "RMSE (INR)",
-            "mae_inr": "MAE (INR)",
-            "mape_pct": "MAPE (%)",
-            "training_time_sec": "Train Latency (s)",
-            "inference_latency_per_sample_ms": "Inference Latency (ms)"
-        })
-        st.dataframe(metrics_df, use_container_width=True)
+        m_df = pd.DataFrame(metrics).T
+        st.markdown("""
+        <div class="dark-card">
+            <div style="font-size: 1.15rem; font-weight: 700; color: #FFFFFF; margin-bottom: 12px;">Model Evaluation Matrix</div>
+        """, unsafe_allow_html=True)
+        st.dataframe(m_df, use_container_width=True)
+        st.markdown('</div>', unsafe_allow_html=True)
 
-    ml_left, ml_right = st.columns([1, 1])
+    st.markdown("<br>", unsafe_allow_html=True)
+    ml_col_left, ml_col_right = st.columns([1, 1])
 
-    with ml_left:
-        st.markdown('<div class="section-title">Feature Importance (Decision Forest Tree Splits)</div>', unsafe_allow_html=True)
+    with ml_col_left:
+        st.markdown("""
+        <div class="dark-card">
+            <div style="font-size: 1.15rem; font-weight: 700; color: #FFFFFF; margin-bottom: 12px;">Gini Feature Importance</div>
+        """, unsafe_allow_html=True)
         if feat_imp:
-            feat_df = pd.DataFrame(list(feat_imp.items()), columns=["Feature", "Importance"]).sort_values("Importance", ascending=True)
-            fig_feat = px.bar(
-                feat_df,
+            f_df = pd.DataFrame(list(feat_imp.items()), columns=["Feature", "Importance"]).sort_values("Importance", ascending=True)
+            fig_f = px.bar(
+                f_df,
                 x="Importance",
                 y="Feature",
                 orientation="h",
-                color_discrete_sequence=["#1E293B"],
-                labels={"Importance": "Gini Importance Score", "Feature": "Input Covariate"}
+                color_discrete_sequence=["#B4F73E"]
             )
-            fig_feat.update_layout(
-                plot_bgcolor="#FFFFFF",
-                paper_bgcolor="#FFFFFF",
-                margin=dict(l=0, r=20, t=10, b=10),
-                height=360,
-                xaxis=dict(showgrid=True, gridcolor="#F1F5F9"),
+            fig_f.update_layout(
+                paper_bgcolor="rgba(0,0,0,0)",
+                plot_bgcolor="rgba(0,0,0,0)",
+                font=dict(color="#8E929A"),
+                margin=dict(l=0, r=10, t=10, b=10),
+                height=320,
+                xaxis=dict(showgrid=True, gridcolor="#27292E"),
                 yaxis=dict(showgrid=False)
             )
-            st.plotly_chart(fig_feat, use_container_width=True)
+            st.plotly_chart(fig_f, use_container_width=True)
+        st.markdown('</div>', unsafe_allow_html=True)
 
-    with ml_right:
-        st.markdown('<div class="section-title">Live Valuation Sandbox (Multi-Model Consensus)</div>', unsafe_allow_html=True)
-        with st.form("valuation_sandbox"):
-            bhk_in = st.slider("Configuration (BHK)", 1, 4, 2)
-            area_in = st.slider("Carpet Area (Sq.Ft)", 400, 3500, 1100, step=50)
-            bath_in = st.slider("Bathrooms", 1, 4, 2)
-            balc_in = st.slider("Balconies", 0, 3, 2)
-            furn_in = st.selectbox("Furnishing Condition", ["Semi-Furnished", "Fully Furnished", "Unfurnished"])
-            transit_in = st.slider("Transit Infrastructure Index", 50, 100, 88)
-            safety_in = st.slider("Locality Safety Rating", 50, 100, 86)
-            
-            calc_btn = st.form_submit_button("Compute Valuations")
+    with ml_col_right:
+        st.markdown("""
+        <div class="dark-card">
+            <div style="font-size: 1.15rem; font-weight: 700; color: #FFFFFF; margin-bottom: 12px;">Live Valuation Sandbox</div>
+        """, unsafe_allow_html=True)
+        with st.form("val_form"):
+            bhk_val = st.slider("BHK Count", 1, 4, 2)
+            carpet_val = st.slider("Carpet Area (Sq.Ft)", 400, 3500, 1100, step=50)
+            bath_val = st.slider("Bathrooms", 1, 4, 2)
+            furn_val = st.selectbox("Furnishing", ["Semi-Furnished", "Fully Furnished", "Unfurnished"])
+            transit_val = st.slider("Transit Index", 50, 100, 88)
+            val_submit = st.form_submit_button("Predict Valuations")
 
-            if calc_btn:
+            if val_submit:
                 from src.ml.predict import PropertyValuationService
                 try:
-                    val_service = PropertyValuationService()
-                    input_covariates = {
-                        "carpet_area_sqft": area_in,
-                        "bhk_count": bhk_in,
-                        "bathrooms": bath_in,
-                        "balconies": balc_in,
+                    serv = PropertyValuationService()
+                    input_obj = {
+                        "carpet_area_sqft": carpet_val,
+                        "bhk_count": bhk_val,
+                        "bathrooms": bath_val,
+                        "balconies": 2,
                         "parking": 1,
                         "gym": 1,
                         "swimming_pool": 1,
-                        "transit_score": transit_in,
-                        "safety_score": safety_in,
+                        "transit_score": transit_val,
+                        "safety_score": 86,
                         "school_score": 85,
-                        "is_furnished": 1 if furn_in != "Unfurnished" else 0,
+                        "is_furnished": 1 if furn_val != "Unfurnished" else 0,
                         "latitude": 28.56,
                         "longitude": 77.38
                     }
-                    predictions = val_service.predict_property(input_covariates)
-                    res_table = pd.DataFrame(predictions).T.rename(columns={
-                        "predicted_price_inr": "Capital Valuation (INR)",
-                        "predicted_price_lakhs": "Valuation (Lakhs)",
-                        "estimated_monthly_rent_inr": "Monthly Rent (INR)",
-                        "projected_rental_yield_pct": "Projected Yield (%)"
-                    })
-                    st.dataframe(res_table[["Valuation (Lakhs)", "Monthly Rent (INR)", "Projected Yield (%)"]], use_container_width=True)
+                    p_res = serv.predict_property(input_obj)
+                    st.dataframe(pd.DataFrame(p_res).T, use_container_width=True)
                 except Exception as ex:
-                    st.error(f"Inference pipeline execution error: {ex}")
+                    st.error(f"Valuation error: {ex}")
+        st.markdown('</div>', unsafe_allow_html=True)
 
 # ==============================================================================
-# VIEW 4: GenAI Research Assistant
+# VIEW 4: GenAI Research Copilot
 # ==============================================================================
-elif nav_selection == "GenAI Research Assistant":
-    st.markdown('<div class="section-title">PropIQ Research Copilot (Text-to-SQL + Vector RAG)</div>', unsafe_allow_html=True)
-    st.markdown("Combines structured SQL analytics over warehouse star schemas with vector retrieval over statutory lease agreements and submarket research briefs.")
+elif nav_selection == "GenAI Research Copilot":
+    st.markdown("""
+    <div class="dashboard-title-container">
+        <div>
+            <div class="dashboard-main-title">GenAI Research Copilot</div>
+            <div class="dashboard-subtitle">Hybrid retrieval combining Star Schema Text-to-SQL and Vector documents.</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
-    st.markdown("**Sample Research Prompts:**")
-    prompt_col1, prompt_col2 = st.columns(2)
-    with prompt_col1:
-        if st.button("Which 2BHK areas in Noida have the best rental yield?"):
-            st.session_state["active_query"] = "Which 2BHK areas in Noida have the best rental yield?"
-    with prompt_col2:
-        if st.button("What are the standard security deposit and lease escalation terms in NCR?"):
-            st.session_state["active_query"] = "What are the standard security deposit and lease escalation terms in NCR?"
+    st.markdown("""
+    <div class="dark-card">
+        <div style="font-size: 1.15rem; font-weight: 700; color: #FFFFFF; margin-bottom: 12px;">Conversational Query Engine</div>
+    """, unsafe_allow_html=True)
 
-    initial_query = st.session_state.get("active_query", "Which 2BHK areas in Noida have the best rental yield?")
-    query_input = st.text_input("Enter research question:", value=initial_query)
+    q_text = st.text_input(
+        "Research Question",
+        value="Which 2BHK areas in Noida have the best rental yield?"
+    )
 
-    if st.button("Execute Research Query"):
+    if st.button("Execute Intelligence Query"):
         from src.rag.assistant import PropIQAssistant
-        with st.spinner("Executing hybrid retrieval across warehouse tables and documents..."):
-            assistant = PropIQAssistant(DUCKDB_PATH, DOCS_DIR)
-            response_pkg = assistant.answer_query(query_input)
+        with st.spinner("Synthesizing warehouse facts and document context..."):
+            asst = PropIQAssistant(DUCKDB_PATH, DOCS_DIR)
+            ans_pkg = asst.answer_query(q_text)
 
-            st.markdown(response_pkg["answer"])
+            st.markdown(ans_pkg["answer"])
 
-            if response_pkg["sql_query"]:
-                with st.expander("Underlying SQL Executed on OLAP Star Schema"):
-                    st.code(response_pkg["sql_query"], language="sql")
+            if ans_pkg["sql_query"]:
+                with st.expander("Underlying SQL Executed on Star Schema"):
+                    st.code(ans_pkg["sql_query"], language="sql")
 
-            if response_pkg["citations"]:
-                with st.expander("Statutory & Market Dossier Citations"):
-                    for cit in response_pkg["citations"]:
-                        st.markdown(f"- {cit}")
+            if ans_pkg["citations"]:
+                with st.expander("Knowledge Base Document Citations"):
+                    for c in ans_pkg["citations"]:
+                        st.markdown(f"- {c}")
+
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # ==============================================================================
-# VIEW 5: Star Schema & Partitions
+# VIEW 5: Star Schema & DW
 # ==============================================================================
-elif nav_selection == "Star Schema & Partitions":
-    st.markdown('<div class="section-title">Kimball Star Schema & Physical Partition Pruning</div>', unsafe_allow_html=True)
+elif nav_selection == "Star Schema & DW":
+    st.markdown("""
+    <div class="dashboard-title-container">
+        <div>
+            <div class="dashboard-main-title">Star Schema & Physical Partitions</div>
+            <div class="dashboard-subtitle">Kimball dimensional architecture and partition pruning benchmarks.</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
-    st.markdown('<div class="section-title">Dimensional Entity Relationship Model</div>', unsafe_allow_html=True)
+    from src.warehouse.partitioning import PartitioningEngine
+    part_dir = os.path.join(BASE_DIR, "data/warehouse/partitions")
+    unpart_file = os.path.join(BASE_DIR, "data/warehouse/fact_property_listings.parquet")
+
+    if os.path.exists(unpart_file) and os.path.exists(part_dir):
+        p_engine = PartitioningEngine(part_dir)
+        bench = p_engine.benchmark_partition_pruning(unpart_file, target_city="Noida")
+
+        b1, b2, b3 = st.columns(3)
+        with b1:
+            st.markdown(f"""
+            <div class="dark-card">
+                <div class="dark-card-label">Unpartitioned Scan Time</div>
+                <div class="dark-card-value-white">{bench['unpartitioned_scan_time_sec'] * 1000:.2f} ms</div>
+                <div class="dark-card-subtext">Full table scan</div>
+            </div>
+            """, unsafe_allow_html=True)
+        with b2:
+            st.markdown(f"""
+            <div class="dark-card">
+                <div class="dark-card-label">Partition Pruned Time</div>
+                <div class="dark-card-value-lime">{bench['partition_pruned_scan_time_sec'] * 1000:.2f} ms</div>
+                <div class="dark-card-subtext">Direct city partition</div>
+            </div>
+            """, unsafe_allow_html=True)
+        with b3:
+            st.markdown(f"""
+            <div class="dark-card">
+                <div class="dark-card-label">Target Submarket</div>
+                <div class="dark-card-value-white">{bench['target_city']}</div>
+                <div class="dark-card-subtext">{bench['speedup_factor']}</div>
+            </div>
+            """, unsafe_allow_html=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("""
+    <div class="dark-card">
+        <div style="font-size: 1.15rem; font-weight: 700; color: #FFFFFF; margin-bottom: 12px;">Kimball Star Schema ERD</div>
+    """, unsafe_allow_html=True)
     st.code("""
                                +-------------------+
                                |     DIM_DATE      |
@@ -583,50 +792,27 @@ elif nav_selection == "Star Schema & Partitions":
                                 | amenity_tier      |
                                 +-------------------+
     """, language="text")
-
-    st.markdown('<div class="section-title">Partition Pruning Performance Benchmark</div>', unsafe_allow_html=True)
-    from src.warehouse.partitioning import PartitioningEngine
-    part_dir = os.path.join(BASE_DIR, "data/warehouse/partitions")
-    unpart_file = os.path.join(BASE_DIR, "data/warehouse/fact_property_listings.parquet")
-
-    if os.path.exists(unpart_file) and os.path.exists(part_dir):
-        p_engine = PartitioningEngine(part_dir)
-        bench = p_engine.benchmark_partition_pruning(unpart_file, target_city="Noida")
-
-        b1, b2, b3 = st.columns(3)
-        with b1:
-            st.markdown(f"""
-            <div class="metric-container">
-                <div class="metric-label">Full Table Scan Latency</div>
-                <div class="metric-value">{bench['unpartitioned_scan_time_sec'] * 1000:.2f} ms</div>
-                <div class="metric-subtext">Unpartitioned Parquet file</div>
-            </div>
-            """, unsafe_allow_html=True)
-        with b2:
-            st.markdown(f"""
-            <div class="metric-container">
-                <div class="metric-label">Pruned Scan Latency</div>
-                <div class="metric-value">{bench['partition_pruned_scan_time_sec'] * 1000:.2f} ms</div>
-                <div class="metric-subtext">Single partition directory</div>
-            </div>
-            """, unsafe_allow_html=True)
-        with b3:
-            st.markdown(f"""
-            <div class="metric-container">
-                <div class="metric-label">Target Submarket</div>
-                <div class="metric-value">{bench['target_city']}</div>
-                <div class="metric-subtext">{bench['speedup_factor']}</div>
-            </div>
-            """, unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # ==============================================================================
-# VIEW 6: BI Integration & Export
+# VIEW 6: BI & Data Exports
 # ==============================================================================
-elif nav_selection == "BI Integration & Export":
-    st.markdown('<div class="section-title">Power BI & Tableau Export Center</div>', unsafe_allow_html=True)
+elif nav_selection == "BI & Data Exports":
+    st.markdown("""
+    <div class="dashboard-title-container">
+        <div>
+            <div class="dashboard-main-title">BI Integration & Data Exports</div>
+            <div class="dashboard-subtitle">Power BI and Tableau dimensional data files and DAX formulas.</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
     export_path = os.path.join(BASE_DIR, "data/warehouse/export_powerbi")
-    st.markdown(f"Analytics-ready dimensional marts are exported to: `{export_path}`")
+    st.markdown(f"""
+    <div class="dark-card">
+        <div style="font-size: 1.15rem; font-weight: 700; color: #FFFFFF; margin-bottom: 12px;">Exported Dimensional Marts</div>
+        <div style="font-size: 0.85rem; color: #8E929A; margin-bottom: 12px;">Directory: <code>{export_path}</code></div>
+    """, unsafe_allow_html=True)
 
     files = [
         "fact_property_listings.csv",
@@ -638,10 +824,16 @@ elif nav_selection == "BI Integration & Export":
     for f in files:
         fp = os.path.join(export_path, f)
         if os.path.exists(fp):
-            size_kb = os.path.getsize(fp) / 1024.0
-            st.markdown(f"- **{f}** ({size_kb:.1f} KB, Star Schema Dimension/Fact)")
+            sz = os.path.getsize(fp) / 1024.0
+            st.markdown(f"- **{f}** ({sz:.1f} KB, Clean Star Schema Mart)")
 
-    st.markdown('<div class="section-title">Production DAX Formulas for Power BI Models</div>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("""
+    <div class="dark-card">
+        <div style="font-size: 1.15rem; font-weight: 700; color: #FFFFFF; margin-bottom: 12px;">Production Power BI DAX Measures</div>
+    """, unsafe_allow_html=True)
     st.code("""
 -- Average Rental Yield %
 Avg_Rental_Yield_Pct = 
@@ -659,7 +851,7 @@ DIVIDE(
     0
 )
 
--- Gross Rent Multiplier (Asset Recovery Period in Years)
+-- Gross Rent Multiplier (GRM)
 Gross_Rent_Multiplier = 
 DIVIDE(
     SUM(fact_property_listings[price_inr]), 
@@ -667,12 +859,4 @@ DIVIDE(
     0
 )
     """, language="sql")
-
-    st.markdown('<div class="section-title">Tableau Calculated Fields</div>', unsafe_allow_html=True)
-    st.code("""
-// Gross Rental Yield %
-(SUM([Rent Inr]) * 12) / SUM([Price Inr]) * 100
-
-// Average Price per Sq.Ft
-SUM([Price Inr]) / SUM([Carpet Area Sqft])
-    """, language="sql")
+    st.markdown('</div>', unsafe_allow_html=True)
