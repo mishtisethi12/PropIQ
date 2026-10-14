@@ -27,47 +27,47 @@ class PropIQAssistant:
 
         if intent == "rental_yield_ranking" and sql_results:
             top_rec = sql_results[0]
-            lines.append(f"### 📊 Rental Yield Analysis for '{query}'\n")
+            lines.append(f"### Rental Yield Analysis: '{query}'\n")
             lines.append(f"Based on real estate data warehouse analytics, **{top_rec['locality']}** in **{top_rec['city']}** delivers the highest average rental yield at **{top_rec['avg_rental_yield_pct']}%** for {top_rec['bhk_label']} units.\n")
             
-            lines.append("#### 🏆 Top Performing Localities Ranking:\n")
-            lines.append("| Rank | Locality | City | Configuration | Avg Price (₹) | Avg Monthly Rent (₹) | Rental Yield | Transit Score |")
+            lines.append("#### Top Performing Localities Ranking:\n")
+            lines.append("| Rank | Locality | City | Configuration | Avg Price (INR) | Avg Monthly Rent (INR) | Rental Yield | Transit Score |")
             lines.append("|:---:|:---|:---|:---:|:---:|:---:|:---:|:---:|")
             for idx, r in enumerate(sql_results[:5], 1):
-                price_fmt = f"₹{r['avg_price']:,.0f}"
-                rent_fmt = f"₹{r['avg_rent']:,.0f}"
+                price_fmt = f"INR {r['avg_price']:,.0f}"
+                rent_fmt = f"INR {r['avg_rent']:,.0f}"
                 lines.append(f"| {idx} | **{r['locality']}** | {r['city']} | {r['bhk_label']} | {price_fmt} | {rent_fmt} | **{r['avg_rental_yield_pct']}%** | {r.get('transit_score', 'N/A')}/100 |")
 
-            lines.append("\n#### 💡 Investment Insights:")
-            lines.append(f"- **Top Recommendation**: {top_rec['locality']} offers the optimal balance of acquisition cost ({top_rec['avg_price']:,.0f} INR) and monthly rental cash flow ({top_rec['avg_rent']:,.0f} INR/month).")
-            lines.append(f"- **Cap Rate / Gross Multiplier**: Gross Rent Multiplier (GRM) is approximately {round(top_rec['avg_price'] / max(top_rec['avg_rent'] * 12, 1), 1)} years.")
+            lines.append("\n#### Investment Metrics & Insights:")
+            lines.append(f"- **Top Opportunity**: {top_rec['locality']} offers the optimal balance of acquisition cost (INR {top_rec['avg_price']:,.0f}) and monthly rental cash flow (INR {top_rec['avg_rent']:,.0f}/month).")
+            lines.append(f"- **Gross Rent Multiplier (GRM)**: Approximately {round(top_rec['avg_price'] / max(top_rec['avg_rent'] * 12, 1), 1)} years to recover asset cost via gross rent.")
 
         elif intent == "price_ranking" and sql_results:
             cheapest = sql_results[0]
-            lines.append(f"### 🏷️ Most Affordable Areas for '{query}'\n")
-            lines.append(f"The most budget-friendly locality identified is **{cheapest['locality']}**, {cheapest['city']} with an average listing price of **₹{cheapest['avg_price']:,.0f}**.\n")
-            lines.append("| Rank | Locality | City | Avg Price (₹) | Price/sq.ft | Rental Yield |")
+            lines.append(f"### Capital Value Ranking: '{query}'\n")
+            lines.append(f"The most competitive entry pricing is in **{cheapest['locality']}**, {cheapest['city']} with an average listing price of **INR {cheapest['avg_price']:,.0f}**.\n")
+            lines.append("| Rank | Locality | City | Avg Price (INR) | Price/sq.ft | Rental Yield |")
             lines.append("|:---:|:---|:---|:---:|:---:|:---:|")
             for idx, r in enumerate(sql_results[:5], 1):
-                lines.append(f"| {idx} | **{r['locality']}** | {r['city']} | ₹{r['avg_price']:,.0f} | ₹{r['avg_price_sqft']:,.0f} | {r['avg_rental_yield_pct']}% |")
+                lines.append(f"| {idx} | **{r['locality']}** | {r['city']} | INR {r['avg_price']:,.0f} | INR {r['avg_price_sqft']:,.0f} | {r['avg_rental_yield_pct']}% |")
 
         # Document Context
         if doc_chunks:
-            lines.append("\n#### 📜 Locality Context & Lease Regulations:")
+            lines.append("\n#### Locality Profile & Statutory Lease Regulations:")
             for chunk in doc_chunks[:2]:
                 title = chunk["title"]
                 text_snippet = chunk["text"]
-                lines.append(f"**From Document [{title}]**:")
+                lines.append(f"**Reference Document [{title}]**:")
                 lines.append(f"> {text_snippet}\n")
 
         if not lines:
-            lines.append(f"### PropIQ Market Intelligence\n")
-            lines.append(f"We analyzed property records and documents for query: *'{query}'*.\n")
+            lines.append(f"### Market Intelligence Query\n")
+            lines.append(f"Evaluated data warehouse records and document index for: '{query}'.\n")
             if doc_chunks:
                 for chunk in doc_chunks:
                     lines.append(f"**{chunk['title']}**\n{chunk['text']}\n")
             else:
-                lines.append("No direct records found matching this exact filter. Try searching for cities like Noida, Gurgaon, Delhi, or Bangalore with BHK configurations.")
+                lines.append("No direct records found matching this exact filter criteria. Specify target metro areas (e.g., Noida, Gurgaon, Delhi, Bangalore) or configuration (e.g., 2 BHK).")
 
         return "\n".join(lines)
 
