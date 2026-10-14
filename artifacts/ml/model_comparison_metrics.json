@@ -1,0 +1,51 @@
+{
+  "metrics": {
+    "Decision Forest": {
+      "r2_score": 0.9641,
+      "rmse_inr": 1784105.14,
+      "mae_inr": 1218528.36,
+      "mape_pct": 7.92,
+      "training_time_sec": 0.2293,
+      "inference_latency_per_sample_ms": 0.0884
+    },
+    "XGBoost": {
+      "r2_score": 0.9681,
+      "rmse_inr": 1680942.08,
+      "mae_inr": 1145716.88,
+      "mape_pct": 7.51,
+      "training_time_sec": 0.1272,
+      "inference_latency_per_sample_ms": 0.0087
+    },
+    "k-NN": {
+      "r2_score": 0.9401,
+      "rmse_inr": 2303067.15,
+      "mae_inr": 1482275.26,
+      "mape_pct": 9.72,
+      "training_time_sec": 0.0043,
+      "inference_latency_per_sample_ms": 0.0125
+    },
+    "Ridge Baseline": {
+      "r2_score": 0.8652,
+      "rmse_inr": 3454371.66,
+      "mae_inr": 2402553.74,
+      "mape_pct": 20.98,
+      "training_time_sec": 0.0035,
+      "inference_latency_per_sample_ms": 0.0006
+    }
+  },
+  "feature_importance": {
+    "carpet_area_sqft": 0.5517,
+    "safety_score": 0.2752,
+    "school_score": 0.0842,
+    "transit_score": 0.0369,
+    "longitude": 0.0225,
+    "latitude": 0.0127,
+    "bathrooms": 0.0079,
+    "is_furnished": 0.0052,
+    "bhk_count": 0.003,
+    "balconies": 0.0008,
+    "parking": 0.0,
+    "gym": 0.0,
+    "swimming_pool": 0.0
+  }
+}

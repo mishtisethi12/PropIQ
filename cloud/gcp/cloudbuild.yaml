@@ -1,0 +1,33 @@
+# PropIQ - Google Cloud Platform Cloud Build & Cloud Run Pipeline
+steps:
+  # 1. Build Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/propiq:latest', '-f', 'docker/Dockerfile', '.']
+
+  # 2. Push image to Container Registry / Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/propiq:latest']
+
+  # 3. Deploy to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'propiq-app'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/propiq:latest'
+      - '--region'
+      - 'asia-south1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--port'
+      - '8501'
+      - '--memory'
+      - '2Gi'
+      - '--cpu'
+      - '2'
+
+images:
+  - 'gcr.io/$PROJECT_ID/propiq:latest'

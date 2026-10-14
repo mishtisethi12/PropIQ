@@ -1,0 +1,23 @@
+// =========================================================
+// PropIQ - Tableau Calculated Fields Formulas
+// =========================================================
+
+// 1. Gross Rental Yield %
+(SUM([Rent Inr]) * 12) / SUM([Price Inr]) * 100
+
+// 2. Average Price per Sq.Ft
+SUM([Price Inr]) / SUM([Carpet Area Sqft])
+
+// 3. Gross Rent Multiplier (GRM)
+SUM([Price Inr]) / (SUM([Rent Inr]) * 12)
+
+// 4. Locality Affordability Band
+IF [Price Inr] < 6000000 THEN "Budget (< 60 Lakhs)"
+ELSEIF [Price Inr] <= 15000000 THEN "Mid-Tier (60L - 1.5Cr)"
+ELSE "Luxury (> 1.5Cr)"
+END
+
+// 5. Yield Category
+IF ([Rent Inr] * 12) / [Price Inr] * 100 >= 4.5 THEN "Top Tier Yield"
+ELSE "Standard Yield"
+END

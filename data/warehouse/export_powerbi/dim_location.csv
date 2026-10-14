@@ -1,0 +1,23 @@
+location_key,city,locality,transit_score,safety_score,school_score,metro_distance_km,hospital_count
+0f7e4fc87505,Noida,Sector 62,92,88,89,0.91,12
+4efa9bff3159,Noida,Sector 18,98,90,86,2.6,6
+586843eab1f0,Noida,Sector 128,82,94,91,1.18,6
+f6eaa8cc84ea,Noida,Sector 76,88,85,87,2.64,3
+c1a35602cf95,Noida,Sector 150,78,92,82,0.72,6
+1148079f8b0c,Noida,Sector 137,85,86,84,0.89,12
+2eabf15b99f3,Delhi,Dwarka,94,87,92,1.98,10
+804b617095b9,Delhi,Rohini,91,84,88,0.75,7
+d4fb997d23da,Delhi,Mayur Vihar,95,86,89,1.75,12
+eb02e16fdb22,Delhi,Saket,96,91,93,1.81,3
+881a763cc2bc,Bangalore,HSR Layout,89,90,92,1.7,6
+faeac456c56a,Bangalore,Indiranagar,92,92,94,0.94,10
+dbe200c5b32e,Bangalore,Electronic City,80,85,85,2.36,6
+f2b97feae553,Bangalore,Whitefield,85,89,91,3.38,10
+1eb4f8126ad1,Gurgaon,Golf Course Road,95,95,96,0.96,5
+f6d02e9a7b13,Gurgaon,Cyber City,98,93,88,1.87,6
+2d643aaf48b4,Gurgaon,Sector 57,86,89,90,2.8,3
+eb07ce3bb19e,Gurgaon,Sohna Road,81,87,89,1.11,3
+6f221ba9a597,Greater Noida,Greater Noida West,79,83,84,1.34,8
+e2ff87ba40e9,Greater Noida,Alpha 1,84,81,83,2.48,11
+435fed6e8777,Greater Noida,Pari Chowk,86,80,85,0.64,9
+e8767507f481,Greater Noida,Omega 1,80,82,81,2.62,5

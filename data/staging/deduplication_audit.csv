@@ -1,0 +1,257 @@
+master_listing_id,master_source,master_price,duplicate_listing_id,duplicate_source,duplicate_price,locality,city,bhk,resolved_action
+ALP-10032,Portal_Alpha,16200000,BET-50031,Portal_Beta,15971000,Sector 62,Noida,3,merged_into_golden_record
+ALP-10064,Portal_Alpha,13550000,BET-50063,Portal_Beta,13571000,Sector 150,Noida,3,merged_into_golden_record
+ALP-10235,Portal_Alpha,22450000,BET-50838,Portal_Beta,22145000,Sector 128,Noida,3,merged_into_golden_record
+ALP-10248,Portal_Alpha,19750000,BET-50247,Portal_Beta,19860000,Sector 150,Noida,3,merged_into_golden_record
+ALP-10297,Portal_Alpha,8500000,BET-50296,Portal_Beta,8464000,Sector 137,Noida,3,merged_into_golden_record
+ALP-10320,Portal_Alpha,23100000,BET-50319,Portal_Beta,23100000,Sector 18,Noida,3,merged_into_golden_record
+ALP-10378,Portal_Alpha,10850000,BET-50377,Portal_Beta,10860000,Sector 76,Noida,3,merged_into_golden_record
+ALP-10383,Portal_Alpha,21350000,BET-50382,Portal_Beta,21247000,Sector 18,Noida,3,merged_into_golden_record
+ALP-10597,Portal_Alpha,9800000,BET-50596,Portal_Beta,9794000,Sector 137,Noida,3,merged_into_golden_record
+ALP-10693,Portal_Alpha,10800000,BET-50692,Portal_Beta,10879000,Sector 137,Noida,3,merged_into_golden_record
+ALP-10763,Portal_Alpha,11350000,BET-50762,Portal_Beta,11375000,Sector 76,Noida,3,merged_into_golden_record
+ALP-10943,Portal_Alpha,15300000,BET-50942,Portal_Beta,15469000,Sector 62,Noida,3,merged_into_golden_record
+ALP-10975,Portal_Alpha,14000000,BET-50974,Portal_Beta,14077000,Sector 137,Noida,3,merged_into_golden_record
+ALP-11002,Portal_Alpha,24950000,BET-51001,Portal_Beta,24799000,Sector 128,Noida,3,merged_into_golden_record
+ALP-10210,Portal_Alpha,9700000,BET-50209,Portal_Beta,9743000,Mayur Vihar,Delhi,1,merged_into_golden_record
+ALP-10307,Portal_Alpha,6450000,BET-50306,Portal_Beta,6543000,Rohini,Delhi,1,merged_into_golden_record
+ALP-10616,Portal_Alpha,6100000,BET-50615,Portal_Beta,6084000,Rohini,Delhi,1,merged_into_golden_record
+ALP-10637,Portal_Alpha,9550000,BET-50636,Portal_Beta,9508000,Saket,Delhi,1,merged_into_golden_record
+ALP-10725,Portal_Alpha,8300000,BET-50724,Portal_Beta,8408000,Saket,Delhi,1,merged_into_golden_record
+ALP-10788,Portal_Alpha,8350000,BET-50787,Portal_Beta,8381000,Mayur Vihar,Delhi,1,merged_into_golden_record
+ALP-10910,Portal_Alpha,5650000,BET-50909,Portal_Beta,5679000,Rohini,Delhi,1,merged_into_golden_record
+ALP-11073,Portal_Alpha,6150000,BET-51072,Portal_Beta,6233000,Rohini,Delhi,1,merged_into_golden_record
+ALP-11098,Portal_Alpha,14150000,BET-51097,Portal_Beta,14351000,Saket,Delhi,1,merged_into_golden_record
+ALP-10185,Portal_Alpha,13150000,BET-50184,Portal_Beta,13344000,Electronic City,Bangalore,3,merged_into_golden_record
+ALP-10266,Portal_Alpha,21750000,BET-50265,Portal_Beta,21791000,Whitefield,Bangalore,3,merged_into_golden_record
+ALP-10278,Portal_Alpha,27600000,BET-50277,Portal_Beta,27587000,Indiranagar,Bangalore,3,merged_into_golden_record
+ALP-10324,Portal_Alpha,13550000,BET-50323,Portal_Beta,13401000,Electronic City,Bangalore,3,merged_into_golden_record
+ALP-10391,Portal_Alpha,19000000,BET-50390,Portal_Beta,19038000,Whitefield,Bangalore,3,merged_into_golden_record
+ALP-10414,Portal_Alpha,12600000,BET-50413,Portal_Beta,12722000,Electronic City,Bangalore,3,merged_into_golden_record
+ALP-10439,Portal_Alpha,17200000,BET-50438,Portal_Beta,17418000,Whitefield,Bangalore,3,merged_into_golden_record
+ALP-10498,Portal_Alpha,32700000,BET-50497,Portal_Beta,32839999,Indiranagar,Bangalore,3,merged_into_golden_record
+ALP-10598,Portal_Alpha,19600000,BET-50597,Portal_Beta,19670000,Whitefield,Bangalore,3,merged_into_golden_record
+ALP-10736,Portal_Alpha,20450000,BET-50735,Portal_Beta,20531000,HSR Layout,Bangalore,3,merged_into_golden_record
+ALP-10904,Portal_Alpha,33650000,BET-50903,Portal_Beta,33374000,Indiranagar,Bangalore,3,merged_into_golden_record
+ALP-11019,Portal_Alpha,25900000,BET-51018,Portal_Beta,26288000,HSR Layout,Bangalore,3,merged_into_golden_record
+ALP-11117,Portal_Alpha,18300000,BET-51116,Portal_Beta,18498000,Whitefield,Bangalore,3,merged_into_golden_record
+ALP-11121,Portal_Alpha,10900000,BET-51120,Portal_Beta,10886000,Electronic City,Bangalore,3,merged_into_golden_record
+ALP-10179,Portal_Alpha,9100000,BET-50178,Portal_Beta,9224000,Sector 57,Gurgaon,1,merged_into_golden_record
+ALP-10310,Portal_Alpha,14350000,BET-50309,Portal_Beta,14547000,Cyber City,Gurgaon,1,merged_into_golden_record
+ALP-10463,Portal_Alpha,10850000,BET-50462,Portal_Beta,10987000,Cyber City,Gurgaon,1,merged_into_golden_record
+ALP-10544,Portal_Alpha,6800000,BET-50543,Portal_Beta,6803000,Cyber City,Gurgaon,1,merged_into_golden_record
+ALP-10559,Portal_Alpha,6000000,BET-50558,Portal_Beta,6007000,Sector 57,Gurgaon,1,merged_into_golden_record
+ALP-10831,Portal_Alpha,7600000,BET-50830,Portal_Beta,7655000,Sector 57,Gurgaon,1,merged_into_golden_record
+ALP-10908,Portal_Alpha,11300000,BET-50907,Portal_Beta,11355000,Golf Course Road,Gurgaon,1,merged_into_golden_record
+ALP-11109,Portal_Alpha,10900000,BET-51108,Portal_Beta,10985000,Cyber City,Gurgaon,1,merged_into_golden_record
+ALP-10060,Portal_Alpha,9950000,BET-50059,Portal_Beta,9912000,Sector 150,Noida,2,merged_into_golden_record
+ALP-10169,Portal_Alpha,9800000,BET-50168,Portal_Beta,9819000,Sector 62,Noida,2,merged_into_golden_record
+ALP-10315,Portal_Alpha,8700000,BET-50314,Portal_Beta,8830000,Sector 137,Noida,2,merged_into_golden_record
+ALP-10345,Portal_Alpha,8850000,BET-50344,Portal_Beta,8881000,Sector 137,Noida,2,merged_into_golden_record
+ALP-10359,Portal_Alpha,8750000,BET-50358,Portal_Beta,8714000,Sector 62,Noida,2,merged_into_golden_record
+ALP-10428,Portal_Alpha,7850000,BET-50427,Portal_Beta,7847000,Sector 137,Noida,2,merged_into_golden_record
+ALP-10631,Portal_Alpha,16450000,BET-50630,Portal_Beta,16518000,Sector 18,Noida,2,merged_into_golden_record
+ALP-10671,Portal_Alpha,7300000,BET-50670,Portal_Beta,7406000,Sector 62,Noida,2,merged_into_golden_record
+ALP-10674,Portal_Alpha,15700000,BET-50673,Portal_Beta,15488999,Sector 18,Noida,2,merged_into_golden_record
+ALP-10677,Portal_Alpha,13050000,BET-50676,Portal_Beta,12972999,Sector 128,Noida,2,merged_into_golden_record
+ALP-10746,Portal_Alpha,9300000,BET-50745,Portal_Beta,9418000,Sector 62,Noida,2,merged_into_golden_record
+ALP-10789,Portal_Alpha,9550000,BET-50788,Portal_Beta,9645000,Sector 76,Noida,2,merged_into_golden_record
+ALP-10827,Portal_Alpha,8550000,BET-50826,Portal_Beta,8549000,Sector 62,Noida,2,merged_into_golden_record
+ALP-10890,Portal_Alpha,7850000,BET-50889,Portal_Beta,7925000,Sector 137,Noida,2,merged_into_golden_record
+ALP-10921,Portal_Alpha,11200000,BET-50920,Portal_Beta,11046000,Sector 18,Noida,2,merged_into_golden_record
+ALP-10937,Portal_Alpha,8800000,BET-50936,Portal_Beta,8700000,Sector 76,Noida,2,merged_into_golden_record
+ALP-10957,Portal_Alpha,8950000,BET-50956,Portal_Beta,8960000,Sector 137,Noida,2,merged_into_golden_record
+ALP-11004,Portal_Alpha,8350000,BET-51003,Portal_Beta,8336000,Sector 76,Noida,2,merged_into_golden_record
+ALP-11005,Portal_Alpha,8700000,BET-51004,Portal_Beta,8789000,Sector 62,Noida,2,merged_into_golden_record
+ALP-11070,Portal_Alpha,7650000,BET-51069,Portal_Beta,7606999,Sector 76,Noida,2,merged_into_golden_record
+ALP-11191,Portal_Alpha,13800000,BET-51190,Portal_Beta,13755000,Sector 128,Noida,2,merged_into_golden_record
+ALP-10244,Portal_Alpha,13550000,BET-50243,Portal_Beta,13576000,Alpha 1,Greater Noida,4,merged_into_golden_record
+ALP-10368,Portal_Alpha,13050000,BET-50367,Portal_Beta,13163999,Alpha 1,Greater Noida,4,merged_into_golden_record
+ALP-10632,Portal_Alpha,16500000,BET-50631,Portal_Beta,16532000,Alpha 1,Greater Noida,4,merged_into_golden_record
+ALP-10821,Portal_Alpha,13250000,BET-50820,Portal_Beta,13447000,Pari Chowk,Greater Noida,4,merged_into_golden_record
+ALP-10951,Portal_Alpha,14300000,BET-50950,Portal_Beta,14216999,Pari Chowk,Greater Noida,4,merged_into_golden_record
+ALP-10024,Portal_Alpha,12850000,BET-50023,Portal_Beta,12745000,Sector 57,Gurgaon,2,merged_into_golden_record
+ALP-10059,Portal_Alpha,9550000,BET-50058,Portal_Beta,9413000,Sohna Road,Gurgaon,2,merged_into_golden_record
+ALP-10087,Portal_Alpha,14800000,BET-50086,Portal_Beta,14936000,Sector 57,Gurgaon,2,merged_into_golden_record
+ALP-10108,Portal_Alpha,17950000,BET-50107,Portal_Beta,17684000,Cyber City,Gurgaon,2,merged_into_golden_record
+ALP-10141,Portal_Alpha,20950000,BET-50140,Portal_Beta,20842000,Golf Course Road,Gurgaon,2,merged_into_golden_record
+ALP-10142,Portal_Alpha,23900000,BET-50141,Portal_Beta,23814000,Golf Course Road,Gurgaon,2,merged_into_golden_record
+ALP-10199,Portal_Alpha,20550000,BET-50198,Portal_Beta,20648000,Cyber City,Gurgaon,2,merged_into_golden_record
+ALP-10209,Portal_Alpha,13400000,BET-50208,Portal_Beta,13533000,Sector 57,Gurgaon,2,merged_into_golden_record
+ALP-10219,Portal_Alpha,27150000,BET-50218,Portal_Beta,27345999,Golf Course Road,Gurgaon,2,merged_into_golden_record
+ALP-10245,Portal_Alpha,14850000,ALP-10622,Portal_Alpha,14300000,Sector 57,Gurgaon,2,merged_into_golden_record
+ALP-10245,Portal_Alpha,14850000,BET-50621,Portal_Beta,14128000,Sector 57,Gurgaon,2,merged_into_golden_record
+ALP-10245,Portal_Alpha,14850000,BET-50244,Portal_Beta,14801000,Sector 57,Gurgaon,2,merged_into_golden_record
+ALP-10309,Portal_Alpha,15250000,BET-50308,Portal_Beta,15219999,Sector 57,Gurgaon,2,merged_into_golden_record
+ALP-10329,Portal_Alpha,17400000,BET-50328,Portal_Beta,17508000,Golf Course Road,Gurgaon,2,merged_into_golden_record
+ALP-10382,Portal_Alpha,26200000,BET-50381,Portal_Beta,26231000,Cyber City,Gurgaon,2,merged_into_golden_record
+ALP-10412,Portal_Alpha,14250000,BET-50411,Portal_Beta,14310000,Sector 57,Gurgaon,2,merged_into_golden_record
+ALP-10472,Portal_Alpha,27250000,BET-50471,Portal_Beta,27018000,Golf Course Road,Gurgaon,2,merged_into_golden_record
+ALP-10514,Portal_Alpha,17100000,BET-50513,Portal_Beta,17031000,Cyber City,Gurgaon,2,merged_into_golden_record
+ALP-10543,Portal_Alpha,18400000,BET-50542,Portal_Beta,18505000,Golf Course Road,Gurgaon,2,merged_into_golden_record
+ALP-10571,Portal_Alpha,13850000,BET-50570,Portal_Beta,13790000,Sector 57,Gurgaon,2,merged_into_golden_record
+ALP-10621,Portal_Alpha,15650000,BET-50620,Portal_Beta,15877000,Cyber City,Gurgaon,2,merged_into_golden_record
+ALP-10627,Portal_Alpha,14050000,BET-50626,Portal_Beta,14163000,Sector 57,Gurgaon,2,merged_into_golden_record
+ALP-10678,Portal_Alpha,12550000,BET-50677,Portal_Beta,12439000,Sohna Road,Gurgaon,2,merged_into_golden_record
+ALP-10766,Portal_Alpha,10300000,BET-50765,Portal_Beta,10379000,Sohna Road,Gurgaon,2,merged_into_golden_record
+ALP-10851,Portal_Alpha,10950000,BET-50850,Portal_Beta,10851000,Sohna Road,Gurgaon,2,merged_into_golden_record
+ALP-10873,Portal_Alpha,11900000,BET-60239,Portal_Beta,11958000,Sector 57,Gurgaon,2,merged_into_golden_record
+ALP-10882,Portal_Alpha,12000000,BET-50881,Portal_Beta,12046000,Sector 57,Gurgaon,2,merged_into_golden_record
+ALP-10909,Portal_Alpha,18850000,BET-50908,Portal_Beta,18945000,Cyber City,Gurgaon,2,merged_into_golden_record
+ALP-10935,Portal_Alpha,22700000,BET-50934,Portal_Beta,22612000,Golf Course Road,Gurgaon,2,merged_into_golden_record
+ALP-11067,Portal_Alpha,16850000,BET-51066,Portal_Beta,17005000,Golf Course Road,Gurgaon,2,merged_into_golden_record
+ALP-11103,Portal_Alpha,22150000,BET-51102,Portal_Beta,22379000,Golf Course Road,Gurgaon,2,merged_into_golden_record
+ALP-11113,Portal_Alpha,16750000,BET-51112,Portal_Beta,16669999,Cyber City,Gurgaon,2,merged_into_golden_record
+ALP-11116,Portal_Alpha,20250000,BET-51115,Portal_Beta,20518000,Cyber City,Gurgaon,2,merged_into_golden_record
+ALP-11192,Portal_Alpha,12250000,BET-51191,Portal_Beta,12234000,Sector 57,Gurgaon,2,merged_into_golden_record
+ALP-10082,Portal_Alpha,10850000,BET-50081,Portal_Beta,10740000,Dwarka,Delhi,2,merged_into_golden_record
+ALP-10130,Portal_Alpha,11500000,BET-50129,Portal_Beta,11538000,Dwarka,Delhi,2,merged_into_golden_record
+ALP-10164,Portal_Alpha,10450000,BET-50163,Portal_Beta,10451000,Dwarka,Delhi,2,merged_into_golden_record
+ALP-10175,Portal_Alpha,18400000,BET-50174,Portal_Beta,18222000,Saket,Delhi,2,merged_into_golden_record
+ALP-10243,Portal_Alpha,21650000,ALP-10734,Portal_Alpha,21050000,Saket,Delhi,2,merged_into_golden_record
+ALP-10287,Portal_Alpha,10350000,BET-50286,Portal_Beta,10298000,Dwarka,Delhi,2,merged_into_golden_record
+ALP-10430,Portal_Alpha,20000000,BET-50429,Portal_Beta,19990000,Mayur Vihar,Delhi,2,merged_into_golden_record
+ALP-10440,Portal_Alpha,13500000,BET-50439,Portal_Beta,13429000,Mayur Vihar,Delhi,2,merged_into_golden_record
+ALP-10482,Portal_Alpha,11000000,BET-50481,Portal_Beta,10883000,Rohini,Delhi,2,merged_into_golden_record
+ALP-10714,Portal_Alpha,20900000,BET-50713,Portal_Beta,21067000,Saket,Delhi,2,merged_into_golden_record
+ALP-10771,Portal_Alpha,20300000,BET-50770,Portal_Beta,20126000,Saket,Delhi,2,merged_into_golden_record
+ALP-10835,Portal_Alpha,7550000,BET-50834,Portal_Beta,7528000,Rohini,Delhi,2,merged_into_golden_record
+ALP-10848,Portal_Alpha,13750000,BET-50847,Portal_Beta,13838000,Mayur Vihar,Delhi,2,merged_into_golden_record
+ALP-10850,Portal_Alpha,17250000,BET-50849,Portal_Beta,17198000,Mayur Vihar,Delhi,2,merged_into_golden_record
+ALP-10894,Portal_Alpha,9450000,BET-50893,Portal_Beta,9504000,Rohini,Delhi,2,merged_into_golden_record
+ALP-10928,Portal_Alpha,16950000,BET-50927,Portal_Beta,16833000,Saket,Delhi,2,merged_into_golden_record
+ALP-10954,Portal_Alpha,18900000,BET-50953,Portal_Beta,19097000,Saket,Delhi,2,merged_into_golden_record
+ALP-10997,Portal_Alpha,14900000,BET-50996,Portal_Beta,15097000,Dwarka,Delhi,2,merged_into_golden_record
+ALP-11137,Portal_Alpha,12500000,BET-51136,Portal_Beta,12687000,Dwarka,Delhi,2,merged_into_golden_record
+ALP-11179,Portal_Alpha,9700000,BET-51178,Portal_Beta,9638000,Dwarka,Delhi,2,merged_into_golden_record
+ALP-10011,Portal_Alpha,5000000,BET-50010,Portal_Beta,4981000,Omega 1,Greater Noida,2,merged_into_golden_record
+ALP-10052,Portal_Alpha,6600000,BET-50051,Portal_Beta,6656000,Alpha 1,Greater Noida,2,merged_into_golden_record
+ALP-10102,Portal_Alpha,6050000,BET-50101,Portal_Beta,6000000,Greater Noida West,Greater Noida,2,merged_into_golden_record
+ALP-10221,Portal_Alpha,6950000,BET-50220,Portal_Beta,6872000,Omega 1,Greater Noida,2,merged_into_golden_record
+ALP-10234,Portal_Alpha,5500000,BET-50233,Portal_Beta,5518000,Omega 1,Greater Noida,2,merged_into_golden_record
+ALP-10241,Portal_Alpha,6200000,BET-50240,Portal_Beta,6134000,Alpha 1,Greater Noida,2,merged_into_golden_record
+ALP-10431,Portal_Alpha,6700000,BET-50430,Portal_Beta,6773999,Pari Chowk,Greater Noida,2,merged_into_golden_record
+ALP-10491,Portal_Alpha,6250000,BET-50490,Portal_Beta,6190000,Alpha 1,Greater Noida,2,merged_into_golden_record
+ALP-10520,Portal_Alpha,4950000,BET-50519,Portal_Beta,4930000,Alpha 1,Greater Noida,2,merged_into_golden_record
+ALP-10768,Portal_Alpha,6700000,BET-50767,Portal_Beta,6620000,Pari Chowk,Greater Noida,2,merged_into_golden_record
+ALP-10790,Portal_Alpha,6400000,BET-50789,Portal_Beta,6368000,Greater Noida West,Greater Noida,2,merged_into_golden_record
+ALP-10974,Portal_Alpha,6900000,BET-50973,Portal_Beta,6859999,Greater Noida West,Greater Noida,2,merged_into_golden_record
+ALP-10992,Portal_Alpha,7250000,BET-50991,Portal_Beta,7220000,Greater Noida West,Greater Noida,2,merged_into_golden_record
+ALP-11025,Portal_Alpha,5250000,BET-51024,Portal_Beta,5321000,Pari Chowk,Greater Noida,2,merged_into_golden_record
+ALP-11040,Portal_Alpha,6300000,BET-51039,Portal_Beta,6252000,Pari Chowk,Greater Noida,2,merged_into_golden_record
+ALP-11167,Portal_Alpha,5050000,BET-51166,Portal_Beta,5072000,Alpha 1,Greater Noida,2,merged_into_golden_record
+ALP-10124,Portal_Alpha,7700000,BET-50123,Portal_Beta,7750000,Omega 1,Greater Noida,3,merged_into_golden_record
+ALP-10136,Portal_Alpha,9000000,BET-50135,Portal_Beta,8952000,Greater Noida West,Greater Noida,3,merged_into_golden_record
+ALP-10332,Portal_Alpha,10550000,BET-50331,Portal_Beta,10573000,Omega 1,Greater Noida,3,merged_into_golden_record
+ALP-10343,Portal_Alpha,9750000,BET-50342,Portal_Beta,9800000,Greater Noida West,Greater Noida,3,merged_into_golden_record
+ALP-10426,Portal_Alpha,9850000,BET-50425,Portal_Beta,9821000,Alpha 1,Greater Noida,3,merged_into_golden_record
+ALP-10694,Portal_Alpha,9500000,BET-50693,Portal_Beta,9632000,Alpha 1,Greater Noida,3,merged_into_golden_record
+ALP-10695,Portal_Alpha,9050000,BET-50694,Portal_Beta,9150000,Omega 1,Greater Noida,3,merged_into_golden_record
+ALP-10856,Portal_Alpha,6450000,BET-50855,Portal_Beta,6443000,Alpha 1,Greater Noida,3,merged_into_golden_record
+ALP-11173,Portal_Alpha,9750000,BET-51172,Portal_Beta,9699000,Omega 1,Greater Noida,3,merged_into_golden_record
+ALP-10044,Portal_Alpha,18550000,BET-50043,Portal_Beta,18442000,Mayur Vihar,Delhi,3,merged_into_golden_record
+ALP-10071,Portal_Alpha,20050000,BET-50070,Portal_Beta,20217000,Dwarka,Delhi,3,merged_into_golden_record
+ALP-10089,Portal_Alpha,14750000,BET-50088,Portal_Beta,14841000,Rohini,Delhi,3,merged_into_golden_record
+ALP-10129,Portal_Alpha,21800000,BET-50128,Portal_Beta,21815000,Mayur Vihar,Delhi,3,merged_into_golden_record
+ALP-10134,Portal_Alpha,36250000,ALP-11068,Portal_Alpha,36150000,Saket,Delhi,3,merged_into_golden_record
+ALP-10334,Portal_Alpha,21800000,BET-50333,Portal_Beta,21742000,Dwarka,Delhi,3,merged_into_golden_record
+ALP-10507,Portal_Alpha,16450000,BET-50506,Portal_Beta,16463999,Rohini,Delhi,3,merged_into_golden_record
+ALP-10533,Portal_Alpha,21400000,BET-50532,Portal_Beta,21565000,Dwarka,Delhi,3,merged_into_golden_record
+ALP-10534,Portal_Alpha,19350000,BET-50533,Portal_Beta,19516000,Rohini,Delhi,3,merged_into_golden_record
+ALP-10599,Portal_Alpha,22200000,BET-50598,Portal_Beta,22235000,Saket,Delhi,3,merged_into_golden_record
+ALP-10644,Portal_Alpha,19050000,BET-50643,Portal_Beta,19175000,Saket,Delhi,3,merged_into_golden_record
+ALP-10712,Portal_Alpha,24000000,BET-50711,Portal_Beta,24083000,Mayur Vihar,Delhi,3,merged_into_golden_record
+ALP-10729,Portal_Alpha,18950000,BET-50728,Portal_Beta,18947000,Mayur Vihar,Delhi,3,merged_into_golden_record
+ALP-10813,Portal_Alpha,20750000,BET-50812,Portal_Beta,21053000,Mayur Vihar,Delhi,3,merged_into_golden_record
+ALP-10866,Portal_Alpha,14700000,BET-50865,Portal_Beta,14649000,Rohini,Delhi,3,merged_into_golden_record
+ALP-10875,Portal_Alpha,16100000,BET-50874,Portal_Beta,16229000,Rohini,Delhi,3,merged_into_golden_record
+ALP-11008,Portal_Alpha,24050000,BET-51007,Portal_Beta,23941000,Saket,Delhi,3,merged_into_golden_record
+ALP-11012,Portal_Alpha,23300000,BET-51011,Portal_Beta,23501000,Mayur Vihar,Delhi,3,merged_into_golden_record
+ALP-11102,Portal_Alpha,20950000,BET-51101,Portal_Beta,21262000,Dwarka,Delhi,3,merged_into_golden_record
+ALP-10077,Portal_Alpha,9700000,BET-50076,Portal_Beta,9821000,Whitefield,Bangalore,2,merged_into_golden_record
+ALP-10139,Portal_Alpha,11700000,BET-50138,Portal_Beta,11743000,Whitefield,Bangalore,2,merged_into_golden_record
+ALP-10171,Portal_Alpha,11750000,BET-50170,Portal_Beta,11703000,Whitefield,Bangalore,2,merged_into_golden_record
+ALP-10211,Portal_Alpha,7150000,BET-50210,Portal_Beta,7172000,Electronic City,Bangalore,2,merged_into_golden_record
+ALP-10261,Portal_Alpha,8600000,BET-50260,Portal_Beta,8703000,Electronic City,Bangalore,2,merged_into_golden_record
+ALP-10271,Portal_Alpha,6650000,BET-50270,Portal_Beta,6645000,Electronic City,Bangalore,2,merged_into_golden_record
+ALP-10295,Portal_Alpha,11850000,BET-50294,Portal_Beta,11720000,Whitefield,Bangalore,2,merged_into_golden_record
+ALP-10328,Portal_Alpha,10600000,BET-50327,Portal_Beta,10627000,Electronic City,Bangalore,2,merged_into_golden_record
+ALP-10434,Portal_Alpha,9300000,BET-50433,Portal_Beta,9212000,Electronic City,Bangalore,2,merged_into_golden_record
+ALP-10479,Portal_Alpha,7850000,BET-50478,Portal_Beta,7936000,Whitefield,Bangalore,2,merged_into_golden_record
+ALP-10524,Portal_Alpha,10450000,BET-50523,Portal_Beta,10376000,Whitefield,Bangalore,2,merged_into_golden_record
+ALP-10535,Portal_Alpha,15900000,BET-50534,Portal_Beta,15888999,HSR Layout,Bangalore,2,merged_into_golden_record
+ALP-10583,Portal_Alpha,10500000,BET-50582,Portal_Beta,10572000,Whitefield,Bangalore,2,merged_into_golden_record
+ALP-10623,Portal_Alpha,16000000,BET-50622,Portal_Beta,16224000,HSR Layout,Bangalore,2,merged_into_golden_record
+ALP-10653,Portal_Alpha,16300000,BET-50652,Portal_Beta,16291999,Indiranagar,Bangalore,2,merged_into_golden_record
+ALP-10683,Portal_Alpha,7900000,BET-50682,Portal_Beta,7841000,Electronic City,Bangalore,2,merged_into_golden_record
+ALP-10728,Portal_Alpha,11750000,BET-50727,Portal_Beta,11680000,Whitefield,Bangalore,2,merged_into_golden_record
+ALP-10868,Portal_Alpha,9500000,BET-50867,Portal_Beta,9404000,Electronic City,Bangalore,2,merged_into_golden_record
+ALP-10899,Portal_Alpha,11550000,BET-50898,Portal_Beta,11614000,Whitefield,Bangalore,2,merged_into_golden_record
+ALP-11023,Portal_Alpha,9050000,BET-51022,Portal_Beta,8931000,Electronic City,Bangalore,2,merged_into_golden_record
+ALP-11131,Portal_Alpha,16650000,BET-60395,Portal_Beta,16269999,HSR Layout,Bangalore,2,merged_into_golden_record
+ALP-11132,Portal_Alpha,16700000,BET-51131,Portal_Beta,16497999,Indiranagar,Bangalore,2,merged_into_golden_record
+ALP-11148,Portal_Alpha,6350000,BET-51147,Portal_Beta,6257000,Electronic City,Bangalore,2,merged_into_golden_record
+ALP-11164,Portal_Alpha,6100000,BET-51163,Portal_Beta,6176000,Electronic City,Bangalore,2,merged_into_golden_record
+ALP-11194,Portal_Alpha,20150000,BET-51193,Portal_Beta,19906000,Indiranagar,Bangalore,2,merged_into_golden_record
+ALP-10050,Portal_Alpha,20100000,BET-50049,Portal_Beta,20088000,Sector 57,Gurgaon,3,merged_into_golden_record
+ALP-10232,Portal_Alpha,27900000,BET-50231,Portal_Beta,27843000,Golf Course Road,Gurgaon,3,merged_into_golden_record
+ALP-10299,Portal_Alpha,17050000,BET-50298,Portal_Beta,17025000,Sohna Road,Gurgaon,3,merged_into_golden_record
+ALP-10355,Portal_Alpha,25100000,BET-50354,Portal_Beta,25183000,Cyber City,Gurgaon,3,merged_into_golden_record
+ALP-10356,Portal_Alpha,31450000,BET-50355,Portal_Beta,31754000,Cyber City,Gurgaon,3,merged_into_golden_record
+ALP-10363,Portal_Alpha,16700000,BET-50362,Portal_Beta,16499000,Sector 57,Gurgaon,3,merged_into_golden_record
+ALP-10381,Portal_Alpha,16050000,BET-50380,Portal_Beta,16113999,Sohna Road,Gurgaon,3,merged_into_golden_record
+ALP-10395,Portal_Alpha,32650000,BET-50394,Portal_Beta,32898000,Golf Course Road,Gurgaon,3,merged_into_golden_record
+ALP-10416,Portal_Alpha,33050000,BET-50415,Portal_Beta,33077999,Golf Course Road,Gurgaon,3,merged_into_golden_record
+ALP-10458,Portal_Alpha,17600000,ALP-11139,Portal_Alpha,17950000,Sohna Road,Gurgaon,3,merged_into_golden_record
+ALP-10561,Portal_Alpha,19750000,BET-50560,Portal_Beta,19647000,Sector 57,Gurgaon,3,merged_into_golden_record
+ALP-10667,Portal_Alpha,15950000,BET-50666,Portal_Beta,15988999,Sohna Road,Gurgaon,3,merged_into_golden_record
+ALP-10845,Portal_Alpha,24550000,BET-50844,Portal_Beta,24771000,Cyber City,Gurgaon,3,merged_into_golden_record
+ALP-10968,Portal_Alpha,19650000,BET-50967,Portal_Beta,19380000,Sector 57,Gurgaon,3,merged_into_golden_record
+ALP-10055,Portal_Alpha,44200000,BET-50054,Portal_Beta,43739000,Indiranagar,Bangalore,4,merged_into_golden_record
+ALP-10193,Portal_Alpha,32550000,BET-50192,Portal_Beta,32202000,HSR Layout,Bangalore,4,merged_into_golden_record
+ALP-10293,Portal_Alpha,39550000,BET-50292,Portal_Beta,39217000,Indiranagar,Bangalore,4,merged_into_golden_record
+ALP-10410,Portal_Alpha,47000000,BET-50409,Portal_Beta,47688000,Indiranagar,Bangalore,4,merged_into_golden_record
+ALP-10718,Portal_Alpha,24950000,BET-50717,Portal_Beta,25246000,HSR Layout,Bangalore,4,merged_into_golden_record
+ALP-10985,Portal_Alpha,37150000,BET-50984,Portal_Beta,37410000,Indiranagar,Bangalore,4,merged_into_golden_record
+ALP-10084,Portal_Alpha,45600000,BET-50083,Portal_Beta,45480000,Cyber City,Gurgaon,4,merged_into_golden_record
+ALP-10110,Portal_Alpha,48950000,BET-50109,Portal_Beta,48766000,Cyber City,Gurgaon,4,merged_into_golden_record
+ALP-10157,Portal_Alpha,29650000,BET-50156,Portal_Beta,29382000,Sector 57,Gurgaon,4,merged_into_golden_record
+ALP-10276,Portal_Alpha,46300000,BET-50275,Portal_Beta,46749000,Golf Course Road,Gurgaon,4,merged_into_golden_record
+ALP-10333,Portal_Alpha,28400000,BET-50332,Portal_Beta,28187000,Sohna Road,Gurgaon,4,merged_into_golden_record
+ALP-11187,Portal_Alpha,23850000,BET-51186,Portal_Beta,24172000,Sohna Road,Gurgaon,4,merged_into_golden_record
+ALP-10097,Portal_Alpha,50750000,BET-50096,Portal_Beta,50343000,Saket,Delhi,4,merged_into_golden_record
+ALP-10159,Portal_Alpha,33250000,BET-50158,Portal_Beta,33470999,Saket,Delhi,4,merged_into_golden_record
+ALP-11136,Portal_Alpha,41250000,BET-51135,Portal_Beta,40889000,Saket,Delhi,4,merged_into_golden_record
+ALP-10045,Portal_Alpha,9600000,BET-50044,Portal_Beta,9491000,HSR Layout,Bangalore,1,merged_into_golden_record
+ALP-10322,Portal_Alpha,4900000,BET-50321,Portal_Beta,4864000,Electronic City,Bangalore,1,merged_into_golden_record
+ALP-10610,Portal_Alpha,4350000,BET-50609,Portal_Beta,4364000,Electronic City,Bangalore,1,merged_into_golden_record
+ALP-10740,Portal_Alpha,4750000,BET-50739,Portal_Beta,4767000,Whitefield,Bangalore,1,merged_into_golden_record
+ALP-10886,Portal_Alpha,6050000,BET-50885,Portal_Beta,6109000,Whitefield,Bangalore,1,merged_into_golden_record
+ALP-10888,Portal_Alpha,6850000,BET-50887,Portal_Beta,6947000,Whitefield,Bangalore,1,merged_into_golden_record
+ALP-10907,Portal_Alpha,4450000,BET-50906,Portal_Beta,4472000,Electronic City,Bangalore,1,merged_into_golden_record
+ALP-11038,Portal_Alpha,10950000,BET-51037,Portal_Beta,11095000,Indiranagar,Bangalore,1,merged_into_golden_record
+ALP-11066,Portal_Alpha,9500000,BET-51065,Portal_Beta,9436000,HSR Layout,Bangalore,1,merged_into_golden_record
+ALP-10114,Portal_Alpha,19400000,BET-50113,Portal_Beta,19113000,Sector 62,Noida,4,merged_into_golden_record
+ALP-10200,Portal_Alpha,19300000,BET-50199,Portal_Beta,19045000,Sector 137,Noida,4,merged_into_golden_record
+ALP-10549,Portal_Alpha,18900000,BET-50548,Portal_Beta,19153000,Sector 62,Noida,4,merged_into_golden_record
+ALP-10738,Portal_Alpha,15700000,BET-50737,Portal_Beta,15631000,Sector 137,Noida,4,merged_into_golden_record
+ALP-10869,Portal_Alpha,17850000,BET-50868,Portal_Beta,17739000,Sector 137,Noida,4,merged_into_golden_record
+ALP-10995,Portal_Alpha,36200000,BET-50994,Portal_Beta,36191000,Sector 18,Noida,4,merged_into_golden_record
+ALP-10057,Portal_Alpha,5950000,BET-50056,Portal_Beta,6017000,Sector 76,Noida,1,merged_into_golden_record
+ALP-10079,Portal_Alpha,7800000,BET-50078,Portal_Beta,7823999,Sector 128,Noida,1,merged_into_golden_record
+ALP-10275,Portal_Alpha,7950000,BET-50274,Portal_Beta,7983000,Sector 18,Noida,1,merged_into_golden_record
+ALP-10291,Portal_Alpha,5150000,BET-50290,Portal_Beta,5112000,Sector 137,Noida,1,merged_into_golden_record
+ALP-10372,Portal_Alpha,4500000,BET-50371,Portal_Beta,4507000,Sector 137,Noida,1,merged_into_golden_record
+ALP-10658,Portal_Alpha,7700000,BET-50657,Portal_Beta,7627000,Sector 128,Noida,1,merged_into_golden_record
+ALP-10809,Portal_Alpha,4400000,BET-50808,Portal_Beta,4413000,Sector 150,Noida,1,merged_into_golden_record
+ALP-10926,Portal_Alpha,8650000,BET-50925,Portal_Beta,8728000,Sector 128,Noida,1,merged_into_golden_record
+ALP-10989,Portal_Alpha,5500000,BET-50988,Portal_Beta,5463000,Sector 62,Noida,1,merged_into_golden_record
+ALP-10156,Portal_Alpha,4300000,BET-50155,Portal_Beta,4277000,Omega 1,Greater Noida,1,merged_into_golden_record
+ALP-10424,Portal_Alpha,4150000,BET-50423,Portal_Beta,4115000,Pari Chowk,Greater Noida,1,merged_into_golden_record
+ALP-10462,Portal_Alpha,3750000,BET-50461,Portal_Beta,3739000,Alpha 1,Greater Noida,1,merged_into_golden_record
+ALP-10550,Portal_Alpha,3100000,BET-50549,Portal_Beta,3097000,Omega 1,Greater Noida,1,merged_into_golden_record
+ALP-10645,Portal_Alpha,3700000,BET-50644,Portal_Beta,3739000,Pari Chowk,Greater Noida,1,merged_into_golden_record
+ALP-10819,Portal_Alpha,3300000,BET-50818,Portal_Beta,3257000,Pari Chowk,Greater Noida,1,merged_into_golden_record
+ALP-10934,Portal_Alpha,2800000,BET-50933,Portal_Beta,2799000,Alpha 1,Greater Noida,1,merged_into_golden_record
+ALP-10998,Portal_Alpha,2900000,BET-50997,Portal_Beta,2864000,Pari Chowk,Greater Noida,1,merged_into_golden_record
+ALP-11048,Portal_Alpha,2800000,BET-51047,Portal_Beta,2809000,Alpha 1,Greater Noida,1,merged_into_golden_record

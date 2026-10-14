@@ -1,0 +1,50 @@
+-- =========================================================
+-- PropIQ - Core DAX Measures for Power BI Real Estate Model
+-- =========================================================
+
+-- 1. Total Properties Listed
+Total_Properties = COUNTROWS('fact_property_listings')
+
+-- 2. Average Listing Price (INR)
+Avg_Price_INR = AVERAGE('fact_property_listings'[price_inr])
+
+-- 3. Average Monthly Rent (INR)
+Avg_Monthly_Rent_INR = AVERAGE('fact_property_listings'[rent_inr])
+
+-- 4. Annualized Rental Yield %
+-- Formula: (Annualized Rent) / Total Purchase Price * 100
+Rental_Yield_Pct = 
+DIVIDE(
+    SUM('fact_property_listings'[rent_inr]) * 12,
+    SUM('fact_property_listings'[price_inr]),
+    0
+) * 100
+
+-- 5. Average Price per Square Foot
+Avg_Price_Per_SqFt = 
+DIVIDE(
+    SUM('fact_property_listings'[price_inr]),
+    SUM('fact_property_listings'[carpet_area_sqft]),
+    0
+)
+
+-- 6. Gross Rent Multiplier (GRM)
+-- Number of years of gross rent required to equal the property price
+Gross_Rent_Multiplier = 
+DIVIDE(
+    SUM('fact_property_listings'[price_inr]),
+    SUM('fact_property_listings'[rent_inr]) * 12,
+    0
+)
+
+-- 7. Capitalization Rate (Cap Rate) assuming 15% operating expenses
+Cap_Rate_Pct = 
+DIVIDE(
+    (SUM('fact_property_listings'[rent_inr]) * 12) * 0.85,
+    SUM('fact_property_listings'[price_inr]),
+    0
+) * 100
+
+-- 8. High Yield Flag (Yield > 4.5%)
+Is_High_Yield = 
+IF([Rental_Yield_Pct] >= 4.5, "High Yield", "Moderate/Standard Yield")

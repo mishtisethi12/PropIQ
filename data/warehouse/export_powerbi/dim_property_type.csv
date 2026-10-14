@@ -1,0 +1,44 @@
+property_type_key,bhk_count,bhk_label,property_category,furnishing_status
+1f45c77503f3,3,3 BHK,Apartment,Unfurnished
+48bb241e2b49,3,3 BHK,Villa,Unfurnished
+d71bc4dc6063,3,3 BHK,Apartment,Semi-Furnished
+6f1e1a5f6e78,3,3 BHK,Apartment,Fully Furnished
+a736bf1d591a,3,3 BHK,Builder Floor,Semi-Furnished
+f2899c4e990c,3,3 BHK,Penthouse,Fully Furnished
+63fd144d5267,3,3 BHK,Villa,Semi-Furnished
+2ef8fa15efa2,3,3 BHK,Builder Floor,Fully Furnished
+2fbf970febfb,3,3 BHK,Builder Floor,Unfurnished
+d2c57885f3e8,3,3 BHK,Villa,Fully Furnished
+29b53e0025da,1,1 BHK,Apartment,Unfurnished
+feba27c00eb2,1,1 BHK,Builder Floor,Semi-Furnished
+88816f8b6c7c,1,1 BHK,Builder Floor,Fully Furnished
+c95c1b111c5e,1,1 BHK,Apartment,Fully Furnished
+bb4c8141bf3f,1,1 BHK,Apartment,Semi-Furnished
+f26afb2d9072,1,1 BHK,Builder Floor,Unfurnished
+17e958cef429,1,1 BHK,Villa,Semi-Furnished
+d6968a73655a,1,1 BHK,Villa,Fully Furnished
+2fb188936054,3,3 BHK,Penthouse,Semi-Furnished
+16492337e0e9,2,2 BHK,Builder Floor,Semi-Furnished
+5ad86ed52e60,2,2 BHK,Apartment,Fully Furnished
+529038d35514,2,2 BHK,Apartment,Unfurnished
+05b8d869de1e,2,2 BHK,Apartment,Semi-Furnished
+1e0ec16590f1,2,2 BHK,Villa,Semi-Furnished
+7b4d5cc3cc1c,2,2 BHK,Villa,Unfurnished
+8cf5f29d49e0,2,2 BHK,Builder Floor,Fully Furnished
+4dc496af26b8,2,2 BHK,Villa,Fully Furnished
+b49490db2d74,2,2 BHK,Builder Floor,Unfurnished
+2f5e7e52f2a6,2,2 BHK,Penthouse,Semi-Furnished
+209208dedd02,4,4 BHK,Builder Floor,Fully Furnished
+6cc0725e6d3c,4,4 BHK,Villa,Unfurnished
+8881081878bd,4,4 BHK,Builder Floor,Unfurnished
+a29c7ca79167,4,4 BHK,Apartment,Semi-Furnished
+4eb5698480b3,4,4 BHK,Builder Floor,Semi-Furnished
+2d0dc0a27dc7,4,4 BHK,Apartment,Fully Furnished
+c46c4d7ec90c,4,4 BHK,Apartment,Unfurnished
+b83ddfbeb875,2,2 BHK,Penthouse,Fully Furnished
+35fb4ebc2b16,2,2 BHK,Penthouse,Unfurnished
+b074ef355fa8,4,4 BHK,Villa,Semi-Furnished
+d28342533bf4,1,1 BHK,Villa,Unfurnished
+c45607dce5bc,1,1 BHK,Penthouse,Unfurnished
+98ccc4fce9c7,4,4 BHK,Penthouse,Semi-Furnished
+35a8d03f4546,1,1 BHK,Penthouse,Semi-Furnished
