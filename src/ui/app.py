@@ -23,11 +23,21 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+import sys
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+if BASE_DIR not in sys.path:
+    sys.path.insert(0, BASE_DIR)
+
 DUCKDB_PATH = os.path.join(BASE_DIR, "data/warehouse/propiq_warehouse.duckdb")
 DOCS_DIR = os.path.join(BASE_DIR, "data/raw/scraped_text")
 METRICS_PATH = os.path.join(BASE_DIR, "artifacts/ml/model_comparison_metrics.json")
 AUDIT_PATH = os.path.join(BASE_DIR, "data/staging/deduplication_audit.csv")
+
+# Top-level service imports
+from src.ml.predict import PropertyValuationService
+from src.rag.assistant import PropIQAssistant
+from src.warehouse.partitioning import PartitioningEngine
 
 # Custom Dark Theme CSS matching template
 st.markdown("""
@@ -636,7 +646,6 @@ elif nav_selection == "ML Valuation Models":
             val_submit = st.form_submit_button("Predict Valuations")
 
             if val_submit:
-                from src.ml.predict import PropertyValuationService
                 try:
                     serv = PropertyValuationService()
                     input_obj = {
@@ -684,7 +693,6 @@ elif nav_selection == "GenAI Research Copilot":
     )
 
     if st.button("Execute Intelligence Query"):
-        from src.rag.assistant import PropIQAssistant
         with st.spinner("Synthesizing warehouse facts and document context..."):
             asst = PropIQAssistant(DUCKDB_PATH, DOCS_DIR)
             ans_pkg = asst.answer_query(q_text)
@@ -715,7 +723,6 @@ elif nav_selection == "Star Schema & DW":
     </div>
     """, unsafe_allow_html=True)
 
-    from src.warehouse.partitioning import PartitioningEngine
     part_dir = os.path.join(BASE_DIR, "data/warehouse/partitions")
     unpart_file = os.path.join(BASE_DIR, "data/warehouse/fact_property_listings.parquet")
 
