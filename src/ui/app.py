@@ -30,7 +30,7 @@ if BASE_DIR not in sys.path:
     sys.path.insert(0, BASE_DIR)
 
 DUCKDB_PATH = os.path.join(BASE_DIR, "data/warehouse/propiq_warehouse.duckdb")
-POSTGRES_URL = "postgresql://postgres:postgrespassword@localhost:5432/propiq_db"
+POSTGRES_URL = "postgresql+psycopg2://postgres:postgrespassword@localhost:5432/propiq_db"
 DOCS_DIR = os.path.join(BASE_DIR, "data/raw/scraped_text")
 METRICS_PATH = os.path.join(BASE_DIR, "artifacts/ml/model_comparison_metrics.json")
 AUDIT_PATH = os.path.join(BASE_DIR, "data/staging/deduplication_audit.csv")
