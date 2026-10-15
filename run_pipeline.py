@@ -69,10 +69,13 @@ def main():
     audit_df.to_csv(audit_path, index=False)
     print(f"[OK] Saved de-duplication audit trail to {audit_path}")
 
-    # 4. Data Quality Testing
+    # 4. Data Quality Testing (Great Expectations Assertion Battery)
+    print("\n========================================================")
+    print("STEP 3: RUNNING GREAT EXPECTATIONS DATA QUALITY SUITE")
+    print("========================================================")
     dq = DataQualitySuite(unique_df)
-    dq_results = dq.run_all_checks()
-    print(f"[OK] Data Quality Suite Passed: {dq_results['passed_tests']}/{dq_results['total_tests']} tests ({dq_results['pass_rate_pct']}%)")
+    dq_results = dq.run_all_checks(halt_on_failure=True)
+    print(f"[OK] Great Expectations Suite Passed: {dq_results['passed_tests']}/{dq_results['total_tests']} tests ({dq_results['pass_rate_pct']}%)")
 
     # 5. Star Schema ETL & DuckDB Warehouse Loading
     warehouse_res = run_star_schema_etl(unique_df, raw_locality)
