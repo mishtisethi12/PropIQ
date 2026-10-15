@@ -1,5 +1,7 @@
 # PropIQ: End-to-End Real Estate Data Platform with GenAI Assistant
 
+**Live Demo**: [https://propiq-sba9h2pxrcdtcsfgqfm4zn.streamlit.app](https://propiq-sba9h2pxrcdtcsfgqfm4zn.streamlit.app)
+
 > **Notice on Synthetic Data & Simulation Context**:
 > All property listings, lease agreements, tenancy clauses, and locality reviews utilized in the PropIQ platform are **synthetically generated** for software engineering, benchmarking, and machine learning demonstration purposes. While geospatial coordinates, infrastructure scores, and financial distributions are modeled to mirror realistic micro-market dynamics across Delhi NCR (Delhi, Noida, Gurgaon, Greater Noida) and Bangalore, no records correspond to actual active legal contracts or live property transactions.
 
@@ -205,9 +207,10 @@ Access the application at [http://localhost:8501](http://localhost:8501).
 
 ---
 
-## 5. Cloud Deployment to AWS & GCP
+## 5. Cloud Deployment & Live Environments
 
-Complete deployment manifests and step-by-step guides are documented in [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
+- **Live Application**: [https://propiq-sba9h2pxrcdtcsfgqfm4zn.streamlit.app](https://propiq-sba9h2pxrcdtcsfgqfm4zn.streamlit.app)
+- **Complete Architecture Manual**: See [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) for full cloud specifications.
 
 - **Amazon Web Services (AWS)**:
   - Production Serverless: Amazon ECS Fargate + Amazon RDS PostgreSQL + Application Load Balancer ([`deploy/aws/ecs-task-definition.json`](deploy/aws/ecs-task-definition.json))
