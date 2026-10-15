@@ -29,8 +29,18 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__fil
 if BASE_DIR not in sys.path:
     sys.path.insert(0, BASE_DIR)
 
-# Dynamic Database URL resolution with environment priority for Docker/Cloud
-_env_pg = os.environ.get("POSTGRES_URL") or os.environ.get("DATABASE_URL")
+# Dynamic Database URL and Secrets resolution with environment and st.secrets priority for Streamlit Cloud
+_env_pg = None
+try:
+    if hasattr(st, "secrets"):
+        _env_pg = st.secrets.get("POSTGRES_URL") or st.secrets.get("DATABASE_URL")
+        if "GEMINI_API_KEY" in st.secrets and not os.environ.get("GEMINI_API_KEY"):
+            os.environ["GEMINI_API_KEY"] = str(st.secrets["GEMINI_API_KEY"])
+except Exception:
+    pass
+
+if not _env_pg:
+    _env_pg = os.environ.get("POSTGRES_URL") or os.environ.get("DATABASE_URL")
 if not _env_pg:
     try:
         import yaml
@@ -46,6 +56,8 @@ if not _env_pg:
 if _env_pg.startswith("postgresql://"):
     _env_pg = _env_pg.replace("postgresql://", "postgresql+psycopg2://", 1)
 POSTGRES_URL = _env_pg
+DUCKDB_PATH = os.path.join(BASE_DIR, "data/warehouse/propiq_warehouse.duckdb")
+DOCS_DIR = os.path.join(BASE_DIR, "data/raw/scraped_text")
 METRICS_PATH = os.path.join(BASE_DIR, "artifacts/ml/model_comparison_metrics.json")
 AUDIT_PATH = os.path.join(BASE_DIR, "data/staging/deduplication_audit.csv")
 DQ_REPORT_PATH = os.path.join(BASE_DIR, "artifacts/quality/data_quality_report.json")
