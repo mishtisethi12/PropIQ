@@ -343,8 +343,13 @@ Key Terms & Regulatory Framework:
     return corpus
 
 def main():
-    base_dir = "C:/Users/misht/.gemini/antigravity/scratch/PropIQ"
-    
+    base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+    os.makedirs(os.path.join(base_dir, "data/raw/csv_sources"), exist_ok=True)
+    os.makedirs(os.path.join(base_dir, "data/raw/api_responses"), exist_ok=True)
+    os.makedirs(os.path.join(base_dir, "data/docs"), exist_ok=True)
+    os.makedirs(os.path.join(base_dir, "data/raw/scraped_text"), exist_ok=True)
+
     print("[1/4] Generating Portal Alpha & Portal Beta datasets...")
     df_alpha, df_beta = generate_dataset(num_records=1200)
     

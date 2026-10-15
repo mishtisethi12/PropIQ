@@ -183,7 +183,7 @@ For rapid prototyping or single-instance evaluation ($10–$20/mo):
    - Inbound Port `8501`: Streamlit UI (or Port `443` via Caddy/Nginx reverse proxy)
    - Inbound Port `22`: SSH administrative access
 3. **Run User Data Script**:
-   Attach [`deploy/aws/ec2-userdata.sh`](file:///C:/Users/misht/.gemini/antigravity/scratch/PropIQ/deploy/aws/ec2-userdata.sh) at launch or run manually via SSH:
+   Attach [`deploy/aws/ec2-userdata.sh`](../deploy/aws/ec2-userdata.sh) at launch or run manually via SSH:
    ```bash
    curl -fsSL https://raw.githubusercontent.com/your-org/PropIQ/master/deploy/aws/ec2-userdata.sh | sudo bash
    ```
