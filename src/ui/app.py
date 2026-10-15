@@ -37,6 +37,7 @@ AUDIT_PATH = os.path.join(BASE_DIR, "data/staging/deduplication_audit.csv")
 
 # Top-level service imports
 from src.ml.predict import PropertyValuationService
+from src.ml.train import train_and_compare_models
 from src.rag.assistant import PropIQAssistant
 from src.rag.chroma_rag import ChromaRAGService
 from src.warehouse.partitioning import PartitioningEngine
@@ -625,32 +626,337 @@ elif nav_selection == "ML Valuation Models":
     st.markdown("""
     <div class="dashboard-title-container">
         <div>
-            <div class="dashboard-main-title">ML Valuation Benchmark</div>
-            <div class="dashboard-subtitle">Decision Forest, k-NN, XGBoost and Ridge baseline comparison.</div>
+            <div class="dashboard-main-title">ML Valuation Models & Cross-Model Benchmark</div>
+            <div class="dashboard-subtitle">Decision Forest (Random Forest), k-NN, Naive Bayes (binned target) and SVM for Property Price and Rent valuation. 80/20 train/test split with 95% bootstrap confidence intervals (1,000 resamples).</div>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
     ml_data = load_ml_metrics()
-    metrics = ml_data.get("metrics", {})
+    price_metrics = ml_data.get("price_metrics", ml_data.get("metrics", {}))
+    rent_metrics = ml_data.get("rent_metrics", {})
     feat_imp = ml_data.get("feature_importance", {})
+    meta = ml_data.get("metadata", {})
 
-    if metrics:
-        m_df = pd.DataFrame(metrics).T
+    # Action Toolbar: Target Selector & Live Retraining
+    col_toolbar1, col_toolbar2 = st.columns([3, 2])
+    with col_toolbar1:
+        selected_target_view = st.radio(
+            "Evaluation Target View",
+            ["Property Price Valuation (INR)", "Monthly Rent Valuation (INR)", "Comparative Side-by-Side"],
+            horizontal=True
+        )
+    with col_toolbar2:
+        st.markdown("<div style='height: 4px;'></div>", unsafe_allow_html=True)
+        retrain_clicked = st.button("Re-train & Benchmark Models Live")
+
+    if retrain_clicked:
+        with st.spinner("Executing 80/20 train/test split, training models, and computing 1,000 bootstrap confidence intervals..."):
+            fact_parquet = os.path.join(BASE_DIR, "data/warehouse/fact_property_listings.parquet")
+            if os.path.exists(fact_parquet):
+                df_raw = pd.read_parquet(fact_parquet)
+                train_and_compare_models(df_raw)
+                st.cache_data.clear()
+                st.success("[OK] ML models retrained and cross-evaluated successfully.")
+                st.rerun()
+
+    # Determine active metrics dictionary
+    if selected_target_view == "Monthly Rent Valuation (INR)":
+        active_metrics = rent_metrics or price_metrics
+        active_target_label = "Monthly Rent (INR)"
+        currency_unit = "INR"
+    elif selected_target_view == "Property Price Valuation (INR)":
+        active_metrics = price_metrics
+        active_target_label = "Property Price (INR)"
+        currency_unit = "INR"
+    else:
+        active_metrics = price_metrics
+        active_target_label = "Property Price (INR)"
+        currency_unit = "INR"
+
+    # KPI Summary Cards
+    st.markdown("<br>", unsafe_allow_html=True)
+    kpi_col1, kpi_col2, kpi_col3, kpi_col4 = st.columns(4)
+
+    # Calculate best model by MAE
+    best_model_name = "N/A"
+    best_mae_val = 0.0
+    best_r2_val = 0.0
+    if active_metrics:
+        sorted_by_mae = sorted(active_metrics.items(), key=lambda x: x[1].get("mae_inr", float("inf")))
+        best_model_name = sorted_by_mae[0][0]
+        best_mae_val = sorted_by_mae[0][1].get("mae_inr", 0.0)
+        best_r2_val = sorted_by_mae[0][1].get("r2_score", 0.0)
+
+    with kpi_col1:
+        st.markdown(f"""
+        <div class="kpi-card">
+            <div class="kpi-label">Lowest Test MAE Model</div>
+            <div class="kpi-value" style="font-size: 1.4rem; color: #B4F73E;">{best_model_name}</div>
+            <div class="kpi-delta positive">MAE: {currency_unit} {best_mae_val:,.0f}</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with kpi_col2:
+        st.markdown(f"""
+        <div class="kpi-card">
+            <div class="kpi-label">Top Model R2 Score</div>
+            <div class="kpi-value">{best_r2_val:.4f}</div>
+            <div class="kpi-delta positive">High variance explained</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with kpi_col3:
+        train_n = meta.get("train_samples", 1275)
+        test_n = meta.get("test_samples", 319)
+        st.markdown(f"""
+        <div class="kpi-card">
+            <div class="kpi-label">Validation Split</div>
+            <div class="kpi-value">80% / 20%</div>
+            <div class="kpi-delta neutral">Train: {train_n:,} | Test: {test_n:,}</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with kpi_col4:
+        boot_n = meta.get("bootstrap_samples", 1000)
+        ci_lvl = int(meta.get("confidence_level", 0.95) * 100)
+        st.markdown(f"""
+        <div class="kpi-card">
+            <div class="kpi-label">Bootstrap Error CI</div>
+            <div class="kpi-value">{ci_lvl}% CI</div>
+            <div class="kpi-delta neutral">{boot_n:,} empirical resamples</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # --------------------------------------------------------------------------
+    # MODEL COMPARISON MATRIX TABLE
+    # --------------------------------------------------------------------------
+    st.markdown("""
+    <div class="dark-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <div style="font-size: 1.15rem; font-weight: 700; color: #FFFFFF;">
+                Model Evaluation Matrix: Decision Forest, k-NN, Naive Bayes & SVM
+            </div>
+            <div style="font-size: 0.80rem; color: #8E929A;">
+                Evaluated on held-out 20% test partition with 95% bootstrap confidence intervals
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
+
+    def build_display_table(metrics_source, target_title):
+        rows = []
+        for name, m in metrics_source.items():
+            mae = m.get("mae_inr", 0.0)
+            ci_low = m.get("mae_ci_lower", 0.0)
+            ci_high = m.get("mae_ci_upper", 0.0)
+            ci_margin = m.get("mae_ci_margin", (ci_high - ci_low) / 2.0)
+            r2 = m.get("r2_score", 0.0)
+            r2_low = m.get("r2_ci_lower", 0.0)
+            r2_high = m.get("r2_ci_upper", 0.0)
+            rmse = m.get("rmse_inr", 0.0)
+            mape = m.get("mape_pct", 0.0)
+            t_train = m.get("training_time_sec", 0.0)
+            lat = m.get("inference_latency_per_sample_ms", 0.0)
+
+            rows.append({
+                "Model Architecture": name,
+                "Target": target_title,
+                "MAE (INR)": f"{mae:,.0f}",
+                "95% Error CI (Bootstrap)": f"[{ci_low:,.0f} - {ci_high:,.0f}]",
+                "Error Margin (+/-)": f"+/- {ci_margin:,.0f}",
+                "R2 Score": f"{r2:.4f}",
+                "95% R2 CI": f"[{r2_low:.4f} - {r2_high:.4f}]",
+                "RMSE (INR)": f"{rmse:,.0f}",
+                "MAPE (%)": f"{mape:.2f}%",
+                "Train Time (s)": f"{t_train:.4f}s",
+                "Inference Latency (ms)": f"{lat:.3f}ms"
+            })
+        return pd.DataFrame(rows)
+
+    if selected_target_view == "Comparative Side-by-Side":
+        t1, t2 = st.tabs(["Property Price Benchmark", "Monthly Rent Benchmark"])
+        with t1:
+            if price_metrics:
+                st.dataframe(build_display_table(price_metrics, "Price (INR)"), use_container_width=True)
+        with t2:
+            if rent_metrics:
+                st.dataframe(build_display_table(rent_metrics, "Rent (INR/mo)"), use_container_width=True)
+    else:
+        if active_metrics:
+            st.dataframe(build_display_table(active_metrics, active_target_label), use_container_width=True)
+
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # --------------------------------------------------------------------------
+    # COMPARISON CHARTS (MAE WITH 95% BOOTSTRAP CI ERROR BARS & R2)
+    # --------------------------------------------------------------------------
+    chart_col1, chart_col2 = st.columns(2)
+
+    chart_models = list(active_metrics.keys())
+    chart_maes = [active_metrics[m].get("mae_inr", 0.0) for m in chart_models]
+    chart_mae_lows = [active_metrics[m].get("mae_ci_lower", active_metrics[m].get("mae_inr", 0.0)) for m in chart_models]
+    chart_mae_highs = [active_metrics[m].get("mae_ci_upper", active_metrics[m].get("mae_inr", 0.0)) for m in chart_models]
+    chart_r2s = [active_metrics[m].get("r2_score", 0.0) for m in chart_models]
+    chart_r2_lows = [active_metrics[m].get("r2_ci_lower", active_metrics[m].get("r2_score", 0.0)) for m in chart_models]
+    chart_r2_highs = [active_metrics[m].get("r2_ci_upper", active_metrics[m].get("r2_score", 0.0)) for m in chart_models]
+
+    # Asymmetric error distances
+    mae_err_plus = [high - val for high, val in zip(chart_mae_highs, chart_maes)]
+    mae_err_minus = [val - low for low, val in zip(chart_mae_lows, chart_maes)]
+
+    r2_err_plus = [high - val for high, val in zip(chart_r2_highs, chart_r2s)]
+    r2_err_minus = [val - low for low, val in zip(chart_r2_lows, chart_r2s)]
+
+    # Colors for charts: champion model gets neon lime #B4F73E
+    min_mae_idx = int(np.argmin(chart_maes)) if chart_maes else 0
+    bar_colors = ["#B4F73E" if i == min_mae_idx else "#282A2F" for i in range(len(chart_models))]
+
+    with chart_col1:
+        st.markdown(f"""
+        <div class="dark-card">
+            <div style="font-size: 1.15rem; font-weight: 700; color: #FFFFFF; margin-bottom: 4px;">
+                Test MAE with 95% Bootstrap Confidence Intervals
+            </div>
+            <div style="font-size: 0.80rem; color: #8E929A; margin-bottom: 12px;">
+                Lower is better. Whiskers denote 2.5th and 97.5th percentiles over 1,000 resamples.
+            </div>
+        """, unsafe_allow_html=True)
+
+        fig_mae = go.Figure()
+        fig_mae.add_trace(go.Bar(
+            x=chart_models,
+            y=chart_maes,
+            marker_color=bar_colors,
+            marker_line=dict(color="#B4F73E", width=1),
+            error_y=dict(
+                type="data",
+                symmetric=False,
+                array=mae_err_plus,
+                arrayminus=mae_err_minus,
+                color="#FFFFFF",
+                thickness=1.8,
+                width=8
+            ),
+            text=[f"INR {v:,.0f}" for v in chart_maes],
+            textposition="auto",
+            textfont=dict(color="#FFFFFF", size=11)
+        ))
+        fig_mae.update_layout(
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
+            font=dict(color="#8E929A"),
+            margin=dict(l=10, r=10, t=20, b=10),
+            height=340,
+            xaxis=dict(showgrid=False, color="#FFFFFF"),
+            yaxis=dict(showgrid=True, gridcolor="#27292E", title=f"MAE ({currency_unit})")
+        )
+        st.plotly_chart(fig_mae, use_container_width=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    with chart_col2:
         st.markdown("""
         <div class="dark-card">
-            <div style="font-size: 1.15rem; font-weight: 700; color: #FFFFFF; margin-bottom: 12px;">Model Evaluation Matrix</div>
+            <div style="font-size: 1.15rem; font-weight: 700; color: #FFFFFF; margin-bottom: 4px;">
+                Coefficient of Determination (R2 Score) & 95% CI
+            </div>
+            <div style="font-size: 0.80rem; color: #8E929A; margin-bottom: 12px;">
+                Higher is better. Whiskers reflect 95% bootstrap confidence interval.
+            </div>
         """, unsafe_allow_html=True)
-        st.dataframe(m_df, use_container_width=True)
+
+        max_r2_idx = int(np.argmax(chart_r2s)) if chart_r2s else 0
+        r2_bar_colors = ["#B4F73E" if i == max_r2_idx else "#282A2F" for i in range(len(chart_models))]
+
+        fig_r2 = go.Figure()
+        fig_r2.add_trace(go.Bar(
+            x=chart_models,
+            y=chart_r2s,
+            marker_color=r2_bar_colors,
+            marker_line=dict(color="#B4F73E", width=1),
+            error_y=dict(
+                type="data",
+                symmetric=False,
+                array=r2_err_plus,
+                arrayminus=r2_err_minus,
+                color="#FFFFFF",
+                thickness=1.8,
+                width=8
+            ),
+            text=[f"{v:.4f}" for v in chart_r2s],
+            textposition="auto",
+            textfont=dict(color="#FFFFFF", size=11)
+        ))
+        fig_r2.update_layout(
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
+            font=dict(color="#8E929A"),
+            margin=dict(l=10, r=10, t=20, b=10),
+            height=340,
+            yaxis=dict(range=[0.0, 1.05], showgrid=True, gridcolor="#27292E", title="R2 Score"),
+            xaxis=dict(showgrid=False, color="#FFFFFF")
+        )
+        st.plotly_chart(fig_r2, use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown("<br>", unsafe_allow_html=True)
+
+    # --------------------------------------------------------------------------
+    # MODEL ARCHITECTURE DETAILS & METHODOLOGY SUMMARY
+    # --------------------------------------------------------------------------
+    st.markdown("""
+    <div class="dark-card">
+        <div style="font-size: 1.15rem; font-weight: 700; color: #FFFFFF; margin-bottom: 12px;">
+            Benchmarked Model Architectures & Methodological Details
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;">
+            <div style="background: #16171A; border: 1px solid #23252A; border-radius: 12px; padding: 14px;">
+                <div style="color: #B4F73E; font-weight: 700; font-size: 0.95rem; margin-bottom: 6px;">1. Decision Forest</div>
+                <div style="color: #8E929A; font-size: 0.80rem; line-height: 1.45;">
+                    Ensemble of 120 decorrelated decision trees with bagging. Robust against non-linear asset features and coordinate outliers.
+                </div>
+            </div>
+            <div style="background: #16171A; border: 1px solid #23252A; border-radius: 12px; padding: 14px;">
+                <div style="color: #29B5E8; font-weight: 700; font-size: 0.95rem; margin-bottom: 6px;">2. k-NN Regressor</div>
+                <div style="color: #8E929A; font-size: 0.80rem; line-height: 1.45;">
+                    Distance-weighted k-Nearest Neighbors (k=7) over standard-scaled spatial and physical attributes. Captures hyper-local micro-market comparables.
+                </div>
+            </div>
+            <div style="background: #16171A; border: 1px solid #23252A; border-radius: 12px; padding: 14px;">
+                <div style="color: #FFA726; font-weight: 700; font-size: 0.95rem; margin-bottom: 6px;">3. Naive Bayes (Binned)</div>
+                <div style="color: #8E929A; font-size: 0.80rem; line-height: 1.45;">
+                    Quantile target discretization (15 bins) + GaussianNB posterior probability classification to continuous expected value E[y|x] = sum(P(c|x)*y_c).
+                </div>
+            </div>
+            <div style="background: #16171A; border: 1px solid #23252A; border-radius: 12px; padding: 14px;">
+                <div style="color: #AB47BC; font-weight: 700; font-size: 0.95rem; margin-bottom: 6px;">4. Support Vector Machine</div>
+                <div style="color: #8E929A; font-size: 0.80rem; line-height: 1.45;">
+                    Epsilon-insensitive Support Vector Regression (SVR) with RBF kernel and dual-scaled target space mapping. Strong generalization on core features.
+                </div>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # --------------------------------------------------------------------------
+    # FEATURE IMPORTANCE & LIVE VALUATION SANDBOX
+    # --------------------------------------------------------------------------
     ml_col_left, ml_col_right = st.columns([1, 1])
 
     with ml_col_left:
         st.markdown("""
         <div class="dark-card">
-            <div style="font-size: 1.15rem; font-weight: 700; color: #FFFFFF; margin-bottom: 12px;">Gini Feature Importance</div>
+            <div style="font-size: 1.15rem; font-weight: 700; color: #FFFFFF; margin-bottom: 4px;">
+                Gini Feature Importance (Decision Forest)
+            </div>
+            <div style="font-size: 0.80rem; color: #8E929A; margin-bottom: 12px;">
+                Identifies top drivers of property valuation across physical and spatial attributes.
+            </div>
         """, unsafe_allow_html=True)
         if feat_imp:
             f_df = pd.DataFrame(list(feat_imp.items()), columns=["Feature", "Importance"]).sort_values("Importance", ascending=True)
@@ -666,7 +972,7 @@ elif nav_selection == "ML Valuation Models":
                 plot_bgcolor="rgba(0,0,0,0)",
                 font=dict(color="#8E929A"),
                 margin=dict(l=0, r=10, t=10, b=10),
-                height=320,
+                height=340,
                 xaxis=dict(showgrid=True, gridcolor="#27292E"),
                 yaxis=dict(showgrid=False)
             )
@@ -676,15 +982,20 @@ elif nav_selection == "ML Valuation Models":
     with ml_col_right:
         st.markdown("""
         <div class="dark-card">
-            <div style="font-size: 1.15rem; font-weight: 700; color: #FFFFFF; margin-bottom: 12px;">Live Valuation Sandbox</div>
+            <div style="font-size: 1.15rem; font-weight: 700; color: #FFFFFF; margin-bottom: 4px;">
+                Live Multi-Model Valuation Sandbox
+            </div>
+            <div style="font-size: 0.80rem; color: #8E929A; margin-bottom: 12px;">
+                Generate simultaneous Price and Rent estimates across all 4 architectures:
+            </div>
         """, unsafe_allow_html=True)
         with st.form("val_form"):
             bhk_val = st.slider("BHK Count", 1, 4, 2)
-            carpet_val = st.slider("Carpet Area (Sq.Ft)", 400, 3500, 1100, step=50)
+            carpet_val = st.slider("Carpet Area (Sq.Ft)", 400, 3500, 1150, step=50)
             bath_val = st.slider("Bathrooms", 1, 4, 2)
             furn_val = st.selectbox("Furnishing", ["Semi-Furnished", "Fully Furnished", "Unfurnished"])
             transit_val = st.slider("Transit Index", 50, 100, 88)
-            val_submit = st.form_submit_button("Predict Valuations")
+            val_submit = st.form_submit_button("Predict Live Valuations Across All Models")
 
             if val_submit:
                 try:
@@ -705,7 +1016,17 @@ elif nav_selection == "ML Valuation Models":
                         "longitude": 77.38
                     }
                     p_res = serv.predict_property(input_obj)
-                    st.dataframe(pd.DataFrame(p_res).T, use_container_width=True)
+
+                    p_rows = []
+                    for m_name, vals in p_res.items():
+                        p_rows.append({
+                            "Model": m_name,
+                            "Predicted Price (INR)": f"INR {vals['predicted_price_inr']:,.0f}",
+                            "Price (Lakhs)": f"INR {vals['predicted_price_lakhs']:.2f} L",
+                            "Estimated Rent (INR/mo)": f"INR {vals['estimated_monthly_rent_inr']:,.0f}/mo",
+                            "Rental Yield (%)": f"{vals['projected_rental_yield_pct']:.2f}%"
+                        })
+                    st.dataframe(pd.DataFrame(p_rows), use_container_width=True)
                 except Exception as ex:
                     st.error(f"Valuation error: {ex}")
         st.markdown('</div>', unsafe_allow_html=True)
