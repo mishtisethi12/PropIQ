@@ -2,7 +2,7 @@
   "suite_name": "propiq_great_expectations_quality_suite",
   "success": true,
   "overall_status": "PASSED",
-  "timestamp": "2026-10-15T10:47:48.962093",
+  "timestamp": "2026-10-15T11:17:56.661391",
   "total_tests": 9,
   "passed_tests": 9,
   "failed_tests": 0,

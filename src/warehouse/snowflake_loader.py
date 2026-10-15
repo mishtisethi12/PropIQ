@@ -13,8 +13,15 @@ base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__fil
 if base_dir not in sys.path:
     sys.path.insert(0, base_dir)
 
-import snowflake.connector
-from snowflake.connector.pandas_tools import write_pandas
+try:
+    import snowflake.connector
+    from snowflake.connector.pandas_tools import write_pandas
+    SNOWFLAKE_AVAILABLE = True
+except ImportError:
+    snowflake = None
+    write_pandas = None
+    SNOWFLAKE_AVAILABLE = False
+
 
 class SnowflakeWarehouseManager:
     def __init__(self, config_path: str = "config/config.yaml"):
@@ -32,11 +39,15 @@ class SnowflakeWarehouseManager:
         self.warehouse_dir = os.path.join(base_dir, cfg["storage"]["warehouse_dir"])
 
     def is_configured(self) -> bool:
-        """Returns True if minimum credentials (account, user, password) are set"""
-        return bool(self.account and self.user and self.password)
+        """Returns True if snowflake connector is installed and credentials are set"""
+        return bool(SNOWFLAKE_AVAILABLE and self.account and self.user and self.password)
 
     def get_connection(self, target_db: bool = True):
         """Creates an authenticated Snowflake connection"""
+        if not SNOWFLAKE_AVAILABLE:
+            raise ImportError(
+                "snowflake-connector-python is not installed. Please install it to use Snowflake."
+            )
         if not self.is_configured():
             raise ValueError(
                 "Snowflake credentials missing. Please set account, user, and password in "
