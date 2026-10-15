@@ -44,14 +44,14 @@ class SnowflakeWarehouseManager:
 
     def get_connection(self, target_db: bool = True):
         """Creates an authenticated Snowflake connection"""
-        if not SNOWFLAKE_AVAILABLE:
-            raise ImportError(
-                "snowflake-connector-python is not installed. Please install it to use Snowflake."
-            )
-        if not self.is_configured():
+        if not (self.account and self.user and self.password):
             raise ValueError(
                 "Snowflake credentials missing. Please set account, user, and password in "
                 "config/config.yaml or via SNOWFLAKE_ACCOUNT, SNOWFLAKE_USER, SNOWFLAKE_PASSWORD env vars."
+            )
+        if not SNOWFLAKE_AVAILABLE:
+            raise ImportError(
+                "snowflake-connector-python is not installed. Please install it to use Snowflake."
             )
 
         kwargs = {

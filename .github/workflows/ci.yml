@@ -10,6 +10,24 @@ jobs:
   test-and-verify:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgrespassword
+          POSTGRES_DB: propiq_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      POSTGRES_URL: postgresql+psycopg2://postgres:postgrespassword@localhost:5432/propiq_db
+
     steps:
       - name: Check out repository
         uses: actions/checkout@v4

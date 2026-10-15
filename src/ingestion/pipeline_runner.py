@@ -56,27 +56,33 @@ def run_ingestion(config_path: str = "config/config.yaml") -> dict:
     df_docs_raw = pd.DataFrame(scraped_docs)
     print(f"[OK] Ingested {len(df_docs_raw)} unstructured documents/lease contracts.")
 
-    # 4. Save to PostgreSQL OLTP Layer using SQLAlchemy
+    # 4. Save to PostgreSQL OLTP Layer using SQLAlchemy (with graceful offline fallback)
     if postgres_url.startswith("postgresql://"):
         postgres_url = postgres_url.replace("postgresql://", "postgresql+psycopg2://", 1)
     print(f"Connecting to PostgreSQL: {postgres_url.split('@')[-1]}")
-    engine = create_engine(postgres_url)
-    
-    # Write tables directly into PostgreSQL
-    df_listings_raw.to_sql("raw_property_listings", engine, if_exists="replace", index=False)
-    df_locality_raw.to_sql("raw_locality_infrastructure", engine, if_exists="replace", index=False)
-    df_docs_raw.to_sql("raw_scraped_documents", engine, if_exists="replace", index=False)
+    c_listings = len(df_listings_raw)
+    c_locality = len(df_locality_raw)
+    c_docs = len(df_docs_raw)
+    try:
+        engine = create_engine(postgres_url, connect_args={"connect_timeout": 5})
+        # Write tables directly into PostgreSQL
+        df_listings_raw.to_sql("raw_property_listings", engine, if_exists="replace", index=False)
+        df_locality_raw.to_sql("raw_locality_infrastructure", engine, if_exists="replace", index=False)
+        df_docs_raw.to_sql("raw_scraped_documents", engine, if_exists="replace", index=False)
 
-    # Verify write directly with a row count query in PostgreSQL
-    with engine.connect() as conn:
-        c_listings = conn.execute(text("SELECT COUNT(*) FROM raw_property_listings")).scalar()
-        c_locality = conn.execute(text("SELECT COUNT(*) FROM raw_locality_infrastructure")).scalar()
-        c_docs = conn.execute(text("SELECT COUNT(*) FROM raw_scraped_documents")).scalar()
+        # Verify write directly with a row count query in PostgreSQL
+        with engine.connect() as conn:
+            c_listings = conn.execute(text("SELECT COUNT(*) FROM raw_property_listings")).scalar()
+            c_locality = conn.execute(text("SELECT COUNT(*) FROM raw_locality_infrastructure")).scalar()
+            c_docs = conn.execute(text("SELECT COUNT(*) FROM raw_scraped_documents")).scalar()
 
-    print(f"[OK] Successfully loaded into PostgreSQL via SQLAlchemy:")
-    print(f"  - raw_property_listings: {c_listings} rows")
-    print(f"  - raw_locality_infrastructure: {c_locality} rows")
-    print(f"  - raw_scraped_documents: {c_docs} rows")
+        print(f"[OK] Successfully loaded into PostgreSQL via SQLAlchemy:")
+        print(f"  - raw_property_listings: {c_listings} rows")
+        print(f"  - raw_locality_infrastructure: {c_locality} rows")
+        print(f"  - raw_scraped_documents: {c_docs} rows")
+    except Exception as e:
+        print(f"[WARN] PostgreSQL write skipped (running in offline/mock mode or database unavailable: {e})")
+
 
     # 5. Save staging copy as parquet
     listings_staging_path = os.path.join(staging_dir, "raw_listings.parquet")

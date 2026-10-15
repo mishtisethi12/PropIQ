@@ -11,8 +11,8 @@
       "mae_ci_margin": 142198.54,
       "rmse_inr": 1784105.14,
       "mape_pct": 7.92,
-      "training_time_sec": 0.1633,
-      "inference_latency_per_sample_ms": 0.0842,
+      "training_time_sec": 0.2092,
+      "inference_latency_per_sample_ms": 0.0878,
       "bootstrap_samples": 1000
     },
     "k-NN": {
@@ -26,8 +26,8 @@
       "mae_ci_margin": 189829.27,
       "rmse_inr": 2303067.15,
       "mape_pct": 9.72,
-      "training_time_sec": 0.0015,
-      "inference_latency_per_sample_ms": 0.006,
+      "training_time_sec": 0.0017,
+      "inference_latency_per_sample_ms": 0.0071,
       "bootstrap_samples": 1000
     },
     "Naive Bayes": {
@@ -41,8 +41,8 @@
       "mae_ci_margin": 290221.54,
       "rmse_inr": 3717814.36,
       "mape_pct": 16.78,
-      "training_time_sec": 0.0016,
-      "inference_latency_per_sample_ms": 0.0022,
+      "training_time_sec": 0.0015,
+      "inference_latency_per_sample_ms": 0.0021,
       "bootstrap_samples": 1000
     },
     "SVM": {
@@ -56,8 +56,8 @@
       "mae_ci_margin": 135007.82,
       "rmse_inr": 1659152.21,
       "mape_pct": 7.56,
-      "training_time_sec": 0.1082,
-      "inference_latency_per_sample_ms": 0.0378,
+      "training_time_sec": 0.1251,
+      "inference_latency_per_sample_ms": 0.0456,
       "bootstrap_samples": 1000
     },
     "XGBoost": {
@@ -71,8 +71,8 @@
       "mae_ci_margin": 133456.94,
       "rmse_inr": 1680942.08,
       "mape_pct": 7.51,
-      "training_time_sec": 0.0848,
-      "inference_latency_per_sample_ms": 0.004,
+      "training_time_sec": 0.1171,
+      "inference_latency_per_sample_ms": 0.0043,
       "bootstrap_samples": 1000
     }
   },
@@ -88,8 +88,8 @@
       "mae_ci_margin": 142198.54,
       "rmse_inr": 1784105.14,
       "mape_pct": 7.92,
-      "training_time_sec": 0.1633,
-      "inference_latency_per_sample_ms": 0.0842,
+      "training_time_sec": 0.2092,
+      "inference_latency_per_sample_ms": 0.0878,
       "bootstrap_samples": 1000
     },
     "k-NN": {
@@ -103,8 +103,8 @@
       "mae_ci_margin": 189829.27,
       "rmse_inr": 2303067.15,
       "mape_pct": 9.72,
-      "training_time_sec": 0.0015,
-      "inference_latency_per_sample_ms": 0.006,
+      "training_time_sec": 0.0017,
+      "inference_latency_per_sample_ms": 0.0071,
       "bootstrap_samples": 1000
     },
     "Naive Bayes": {
@@ -118,8 +118,8 @@
       "mae_ci_margin": 290221.54,
       "rmse_inr": 3717814.36,
       "mape_pct": 16.78,
-      "training_time_sec": 0.0016,
-      "inference_latency_per_sample_ms": 0.0022,
+      "training_time_sec": 0.0015,
+      "inference_latency_per_sample_ms": 0.0021,
       "bootstrap_samples": 1000
     },
     "SVM": {
@@ -133,8 +133,8 @@
       "mae_ci_margin": 135007.82,
       "rmse_inr": 1659152.21,
       "mape_pct": 7.56,
-      "training_time_sec": 0.1082,
-      "inference_latency_per_sample_ms": 0.0378,
+      "training_time_sec": 0.1251,
+      "inference_latency_per_sample_ms": 0.0456,
       "bootstrap_samples": 1000
     },
     "XGBoost": {
@@ -148,8 +148,8 @@
       "mae_ci_margin": 133456.94,
       "rmse_inr": 1680942.08,
       "mape_pct": 7.51,
-      "training_time_sec": 0.0848,
-      "inference_latency_per_sample_ms": 0.004,
+      "training_time_sec": 0.1171,
+      "inference_latency_per_sample_ms": 0.0043,
       "bootstrap_samples": 1000
     }
   },
@@ -165,8 +165,8 @@
       "mae_ci_margin": 478.33,
       "rmse_inr": 6133.0,
       "mape_pct": 8.73,
-      "training_time_sec": 0.1595,
-      "inference_latency_per_sample_ms": 0.0867,
+      "training_time_sec": 0.2131,
+      "inference_latency_per_sample_ms": 0.085,
       "bootstrap_samples": 1000
     },
     "k-NN": {
@@ -180,8 +180,8 @@
       "mae_ci_margin": 627.81,
       "rmse_inr": 7818.18,
       "mape_pct": 10.43,
-      "training_time_sec": 0.0014,
-      "inference_latency_per_sample_ms": 0.0059,
+      "training_time_sec": 0.0024,
+      "inference_latency_per_sample_ms": 0.0083,
       "bootstrap_samples": 1000
     },
     "Naive Bayes": {
@@ -195,8 +195,8 @@
       "mae_ci_margin": 870.03,
       "rmse_inr": 12927.22,
       "mape_pct": 21.61,
-      "training_time_sec": 0.0021,
-      "inference_latency_per_sample_ms": 0.0023,
+      "training_time_sec": 0.0013,
+      "inference_latency_per_sample_ms": 0.0019,
       "bootstrap_samples": 1000
     },
     "SVM": {
@@ -210,8 +210,8 @@
       "mae_ci_margin": 476.02,
       "rmse_inr": 5883.16,
       "mape_pct": 8.41,
-      "training_time_sec": 0.1139,
-      "inference_latency_per_sample_ms": 0.0474,
+      "training_time_sec": 0.1526,
+      "inference_latency_per_sample_ms": 0.0752,
       "bootstrap_samples": 1000
     },
     "XGBoost": {
@@ -225,8 +225,8 @@
       "mae_ci_margin": 520.58,
       "rmse_inr": 6297.6,
       "mape_pct": 8.32,
-      "training_time_sec": 0.0749,
-      "inference_latency_per_sample_ms": 0.0051,
+      "training_time_sec": 0.1151,
+      "inference_latency_per_sample_ms": 0.0042,
       "bootstrap_samples": 1000
     }
   },
