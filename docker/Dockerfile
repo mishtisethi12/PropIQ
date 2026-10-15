@@ -1,29 +1,31 @@
-# PropIQ - Production Dockerfile
+# PropIQ - Streamlit Web Application Dockerfile
 FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install system dependencies
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    STREAMLIT_SERVER_PORT=8501 \
+    STREAMLIT_SERVER_ADDRESS=0.0.0.0 \
+    STREAMLIT_SERVER_HEADLESS=true \
+    STREAMLIT_BROWSER_GATHER_USAGE_STATS=false
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     curl \
     git \
     libpq-dev \
+    libpq5 \
     && rm -rf /var/lib/apt/lists/*
 
-# Install python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy project source code
 COPY . .
 
-# Run data pipeline to populate local warehouse on build
-RUN python src/ingestion/generate_sample_data.py && python run_pipeline.py
+EXPOSE 8501
 
-# Expose ports: 8501 for Streamlit UI, 8000 for optional FastAPI
-EXPOSE 8501 8000
+HEALTHCHECK --interval=20s --timeout=5s --start-period=15s --retries=3 \
+    CMD curl --fail http://localhost:8501/_stcore/health || exit 1
 
-HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health || exit 1
-
-ENTRYPOINT ["streamlit", "run", "src/ui/app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+ENTRYPOINT ["streamlit", "run", "src/ui/app.py", "--server.port=8501", "--server.address=0.0.0.0", "--server.headless=true"]

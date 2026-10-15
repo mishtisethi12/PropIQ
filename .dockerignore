@@ -1,0 +1,32 @@
+# Git & Version Control
+.git
+.gitignore
+
+# Python Bytecode & Environments
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.env
+.venv/
+env/
+venv/
+ENV/
+
+# Local Windows PostgreSQL Installation
+pgsql/
+scripts/postgres_binaries.zip
+scripts/pg_password.txt
+
+# Testing & Artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini

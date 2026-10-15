@@ -243,28 +243,23 @@ Open your browser at `http://localhost:8501`.
 
 ## Docker & Cloud Deployment
 
-### Run Multi-Container with Docker Compose
-```bash
-cd docker
-docker-compose up --build
-```
-This launches:
-- **PostgreSQL 16 OLTP Database** on port `5432`
-- **PropIQ Application & AI Copilot** on port `8501`
+For the complete, step-by-step production deployment manual, refer to [DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
-### AWS ECS Fargate Deployment
-Task definition is located at `cloud/aws/ecs_task_def.json`.
-Deploy with AWS CLI:
+### 1. One-Command Local Launch with Docker Compose
+Launch both the **PostgreSQL 16 OLTP Database** and the **PropIQ Streamlit Web Platform** with automatic healthcheck dependency handling:
 ```bash
-aws ecs register-task-definition --cli-input-json file://cloud/aws/ecs_task_def.json
-aws ecs create-service --cluster propiq-cluster --service-name propiq-svc --task-definition propiq-data-platform
+docker compose up --build -d
 ```
+Access the application at [http://localhost:8501](http://localhost:8501) and PostgreSQL at `localhost:5432`.
 
-### GCP Cloud Run Deployment
-Run via Cloud Build:
-```bash
-gcloud builds submit --config=cloud/gcp/cloudbuild.yaml
-```
+### 2. AWS Cloud Deployment (ECS Fargate / EC2)
+- Production Fargate Task Definition: [`deploy/aws/ecs-task-definition.json`](deploy/aws/ecs-task-definition.json)
+- EC2 / Lightsail Automated Setup: [`deploy/aws/ec2-userdata.sh`](deploy/aws/ec2-userdata.sh)
+- App Runner Configuration: [`deploy/aws/app-runner.yaml`](deploy/aws/app-runner.yaml)
+
+### 3. GCP Cloud Deployment (Cloud Run / Cloud SQL)
+- Automated Deployment Script: [`deploy/gcp/deploy_cloud_run.sh`](deploy/gcp/deploy_cloud_run.sh)
+- Google Cloud Build Pipeline: [`deploy/gcp/cloudbuild.yaml`](deploy/gcp/cloudbuild.yaml)
 
 ---
 

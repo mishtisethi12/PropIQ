@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  # Operational & Analytical Database (PostgreSQL 16)
+  postgres:
+    image: postgres:16-alpine
+    container_name: propiq_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_DB: propiq_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d propiq_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - propiq-network
+
+  # PropIQ Streamlit Analytics Application & GenAI Platform
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: propiq_app
+    restart: unless-stopped
+    environment:
+      - POSTGRES_URL=postgresql+psycopg2://postgres:postgrespassword@postgres:5432/propiq_db
+      - DATABASE_URL=postgresql+psycopg2://postgres:postgrespassword@postgres:5432/propiq_db
+      - STREAMLIT_SERVER_PORT=8501
+      - STREAMLIT_SERVER_ADDRESS=0.0.0.0
+      - STREAMLIT_SERVER_HEADLESS=true
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+    ports:
+      - "8501:8501"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./data:/app/data
+      - ./artifacts:/app/artifacts
+      - ./config:/app/config
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8501/_stcore/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    networks:
+      - propiq-network
+
+volumes:
+  postgres_data:
+    name: propiq_postgres_data
+
+networks:
+  propiq-network:
+    name: propiq_network
+    driver: bridge

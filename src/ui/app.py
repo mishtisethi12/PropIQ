@@ -29,9 +29,23 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__fil
 if BASE_DIR not in sys.path:
     sys.path.insert(0, BASE_DIR)
 
-DUCKDB_PATH = os.path.join(BASE_DIR, "data/warehouse/propiq_warehouse.duckdb")
-POSTGRES_URL = "postgresql+psycopg2://postgres:postgrespassword@localhost:5432/propiq_db"
-DOCS_DIR = os.path.join(BASE_DIR, "data/raw/scraped_text")
+# Dynamic Database URL resolution with environment priority for Docker/Cloud
+_env_pg = os.environ.get("POSTGRES_URL") or os.environ.get("DATABASE_URL")
+if not _env_pg:
+    try:
+        import yaml
+        _cfg_path = os.path.join(BASE_DIR, "config/config.yaml")
+        if os.path.exists(_cfg_path):
+            with open(_cfg_path, "r", encoding="utf-8") as _yf:
+                _cfg_data = yaml.safe_load(_yf)
+                _env_pg = _cfg_data.get("database", {}).get("postgres_url")
+    except Exception:
+        pass
+if not _env_pg:
+    _env_pg = "postgresql+psycopg2://postgres:postgrespassword@localhost:5432/propiq_db"
+if _env_pg.startswith("postgresql://"):
+    _env_pg = _env_pg.replace("postgresql://", "postgresql+psycopg2://", 1)
+POSTGRES_URL = _env_pg
 METRICS_PATH = os.path.join(BASE_DIR, "artifacts/ml/model_comparison_metrics.json")
 AUDIT_PATH = os.path.join(BASE_DIR, "data/staging/deduplication_audit.csv")
 DQ_REPORT_PATH = os.path.join(BASE_DIR, "artifacts/quality/data_quality_report.json")

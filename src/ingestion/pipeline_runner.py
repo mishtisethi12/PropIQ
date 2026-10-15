@@ -31,7 +31,7 @@ def run_ingestion(config_path: str = "config/config.yaml") -> dict:
     beta_csv = os.path.join(base_dir, cfg["ingestion"]["csv_sources"][1]["path"])
     api_endpoint = os.path.join(base_dir, cfg["ingestion"]["api_config"]["endpoint_mock_file"])
     scraped_dir = os.path.join(base_dir, cfg["ingestion"]["scraper_config"]["unstructured_html_dir"])
-    postgres_url = cfg["storage"]["postgres_url"]
+    postgres_url = os.environ.get("POSTGRES_URL") or os.environ.get("DATABASE_URL") or cfg["storage"]["postgres_url"]
     staging_dir = os.path.join(base_dir, cfg["storage"]["staging_dir"])
     os.makedirs(staging_dir, exist_ok=True)
 

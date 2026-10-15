@@ -1,0 +1,43 @@
+steps:
+  # 1. Build Docker image with Google Cloud Build
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - '$_AR_LOCATION-docker.pkg.dev/$PROJECT_ID/propiq-repo/propiq-app:$COMMIT_SHA'
+      - '-t'
+      - '$_AR_LOCATION-docker.pkg.dev/$PROJECT_ID/propiq-repo/propiq-app:latest'
+      - '.'
+
+  # 2. Push image to Google Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - '--all-tags'
+      - '$_AR_LOCATION-docker.pkg.dev/$PROJECT_ID/propiq-repo/propiq-app'
+
+  # 3. Deploy container image to Google Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'propiq-app'
+      - '--image=$_AR_LOCATION-docker.pkg.dev/$PROJECT_ID/propiq-repo/propiq-app:$COMMIT_SHA'
+      - '--region=$_REGION'
+      - '--platform=managed'
+      - '--port=8501'
+      - '--allow-unauthenticated'
+      - '--set-env-vars=STREAMLIT_SERVER_PORT=8501,STREAMLIT_SERVER_ADDRESS=0.0.0.0,STREAMLIT_SERVER_HEADLESS=true'
+      - '--set-secrets=POSTGRES_URL=propiq-postgres-url:latest,GEMINI_API_KEY=propiq-gemini-api-key:latest'
+
+images:
+  - '$_AR_LOCATION-docker.pkg.dev/$PROJECT_ID/propiq-repo/propiq-app:$COMMIT_SHA'
+  - '$_AR_LOCATION-docker.pkg.dev/$PROJECT_ID/propiq-repo/propiq-app:latest'
+
+substitutions:
+  _REGION: 'us-central1'
+  _AR_LOCATION: 'us-central1'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
