@@ -1,268 +1,252 @@
-# PropIQ: End-to-End Real Estate Data Platform with a GenAI Assistant
+# PropIQ: End-to-End Real Estate Data Platform with GenAI Assistant
 
-[![CI/CD Pipeline](https://github.com/propiq/propiq-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/propiq/propiq-platform/actions/workflows/ci.yml)
-[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
-[![DuckDB](https://img.shields.io/badge/DuckDB-OLAP%20Warehouse-yellow.svg)](https://duckdb.org/)
-[![Snowflake Ready](https://img.shields.io/badge/Snowflake-Warehouse%20DDLs-29B5E8.svg)](https://www.snowflake.com/)
-[![Docker](https://img.shields.io/badge/Docker-Multi--Container-2496ED.svg)](https://www.docker.com/)
-[![Streamlit](https://img.shields.io/badge/Streamlit-UI%20Dashboard-FF4B4B.svg)](https://streamlit.io/)
-
-> **PropIQ** is a production-grade enterprise real estate lakehouse and analytics platform. It ingests property listings, rental values, and locality infrastructure metrics from heterogeneous sources, cleans and deduplicates cross-portal listings, models the data into a **Kimball Star Schema**, optimizes queries via **City/Month Partitioning**, trains and compares **ML valuation models (Decision Forest, k-NN, XGBoost)**, and powers a **Hybrid GenAI Copilot (Text-to-SQL + Vector RAG)**.
+> **Notice on Synthetic Data & Simulation Context**:
+> All property listings, lease agreements, tenancy clauses, and locality reviews utilized in the PropIQ platform are **synthetically generated** for software engineering, benchmarking, and machine learning demonstration purposes. While geospatial coordinates, infrastructure scores, and financial distributions are modeled to mirror realistic micro-market dynamics across Delhi NCR (Delhi, Noida, Gurgaon, Greater Noida) and Bangalore, no records correspond to actual active legal contracts or live property transactions.
 
 ---
 
-## Which Job Description (JD) Gap Each Part Fills
-
-| Platform Component | Technical Implementation in PropIQ | JD Requirement Covered |
-| :--- | :--- | :--- |
-| **Multi-Source Ingestion** | Ingestion from standard CSV (Portal Alpha), semi-structured CSV with regex parsing (Portal Beta), Public Infrastructure REST API, and scraped text/HTML | **Data Ingestion, ETL/ELT Pipelines** |
-| **Cleaning & De-duplication** | Spatial-attribute blocking, Haversine geo-distance clustering (< 75m), price/area variance tolerance (±5%), and audit trail | **Data Quality, Record Linkage, De-duplication** |
-| **Storage Architecture** | Raw landing in PostgreSQL (OLTP) and analytics-ready dimensional marts in Snowflake / DuckDB (OLAP) | **SQL, PostgreSQL, Snowflake, OLTP vs OLAP** |
-| **Dimensional Modeling** | Fact (`fact_property_listings`) and Dimensions (`dim_location`, `dim_property_type`, `dim_amenities`, `dim_date`) | **Data Modeling, Kimball Star Schema, Surrogate Keys** |
-| **Physical Partitioning** | Hive-style physical partitioning by `city` and `month`, with partition pruning benchmarks | **Partitioning, Sharding, Query Optimization** |
-| **ML Valuation Engine** | Cross-algorithm benchmarking of **Decision Forest** (Random Forest), **k-NN**, **XGBoost**, and **Ridge** with latency & feature importance | **Machine Learning Techniques named in JDs** |
-| **GenAI Assistant** | Hybrid Copilot combining Star Schema Text-to-SQL (exact yield calculation) and Vector RAG over lease documents & locality reviews | **GenAI, LLMs, RAG, Hybrid Retrieval** |
-| **Business Intelligence** | Interactive Streamlit Dashboard + Pre-configured Power BI DAX measures & Tableau calculated fields | **Data Visualization, Power BI, Tableau** |
-| **Cloud & Production** | Docker multi-container compose, AWS ECS Fargate task def, GCP Cloud Run manifests, and GitHub Actions CI/CD | **Cloud (AWS/GCP), Docker, Productionizing** |
-
----
-
-## System Architecture
+## 1. System Architecture
 
 ```mermaid
 flowchart TD
-    subgraph Data_Sources["1. Multi-Source Ingestion Layer"]
-        S1["Portal Alpha (Standard CSV)"]
-        S2["Portal Beta (Messy CSV / Duplicates)"]
-        S3["Locality Infrastructure API (JSON)"]
-        S4["Scraped Text & Lease Agreements (MD/HTML)"]
+    subgraph S1["1. Multi-Source Ingestion Layer"]
+        CSV_A["Portal Alpha (Standard CSV)"]
+        CSV_B["Portal Beta (Unstructured CSV / Duplicates)"]
+        API_LOC["Locality Infrastructure REST API"]
+        DOCS["Lease Contracts & Locality Reviews (MD/Text)"]
     end
 
-    subgraph Staging_OLTP["2. Raw Operational Layer (OLTP)"]
-        R1[("PostgreSQL / SQLite Raw Tables")]
-        N1["Data Normalizer (Regex, Bounds, Types)"]
-        D1["Spatial De-duplicator (Haversine < 75m, Price ±5%)"]
-        Q1["Data Quality Suite (Assertions & Auditing)"]
+    subgraph S2["2. Operational Storage & Quality Layer"]
+        PG[("PostgreSQL 16 OLTP (propiq_db)")]
+        DEDUP["Spatial-Attribute Deduplicator (Haversine < 75m, Price +/- 5%)"]
+        GX["Great Expectations Suite (Circuit Breaker: halt_on_failure)"]
     end
 
-    subgraph Warehouse_OLAP["3. Enterprise Warehouse Layer (OLAP)"]
-        W1[("Snowflake / DuckDB Star Schema")]
-        F1["fact_property_listings"]
-        D_LOC["dim_location"]
-        D_PROP["dim_property_type"]
-        D_AMEN["dim_amenities"]
-        D_DATE["dim_date"]
-        PART["City & Month Partitions (/by_city/city=Noida/...)"]
+    subgraph S3["3. Analytical Warehouse Layer (OLAP)"]
+        DUCK[("DuckDB 1.1 Warehouse (propiq_warehouse.duckdb)")]
+        SF[("Snowflake Data Cloud (PROPIQ_DW)")]
+        FACT["fact_property_listings (1,594 rows)"]
+        D_LOC["dim_location (22 rows)"]
+        D_PROP["dim_property_type (43 rows)"]
+        D_AMEN["dim_amenities (24 rows)"]
+        D_DATE["dim_date (730 rows)"]
+        PARTS["Physical Partitions (/by_city/city=Noida/data.parquet)"]
     end
 
-    subgraph Analytics_AI["4. Analytics & AI Serving Layer"]
-        ML1["Decision Forest vs k-NN vs XGBoost Regressors"]
-        RAG1["Hybrid GenAI Copilot (Text-to-SQL + Vector RAG)"]
-        UI1["Interactive Streamlit Web Application"]
-        BI1["Power BI / Tableau Ready Marts (.csv / DAX)"]
+    subgraph S4["4. ML Valuation & Vector RAG Tier"]
+        ML_MODELS["ML Valuation: Decision Forest, SVM, k-NN, Naive Bayes"]
+        CHROMA["ChromaDB Vector Store (all-MiniLM-L6-v2 ONNX)"]
+        MMR["Maximal Marginal Relevance (MMR) Diversity Engine"]
     end
 
-    S1 & S2 & S3 & S4 --> R1
-    R1 --> N1 --> D1 --> Q1
-    Q1 --> W1
-    W1 --> F1 & D_LOC & D_PROP & D_AMEN & D_DATE
-    F1 --> PART
-    W1 --> ML1
-    W1 & S4 --> RAG1
-    ML1 & RAG1 & PART --> UI1
-    W1 --> BI1
+    subgraph S5["5. Production Serving & User Interface"]
+        STREAMLIT["Streamlit 1.43 Dark Fintech Terminal (Port 8501)"]
+        BI["Power BI DAX & Tableau Exports"]
+    end
+
+    CSV_A --> PG
+    CSV_B --> PG
+    API_LOC --> PG
+    DOCS --> PG
+    PG --> DEDUP
+    DEDUP --> GX
+    GX --> DUCK
+    GX --> SF
+    DUCK --> FACT
+    DUCK --> D_LOC
+    DUCK --> D_PROP
+    DUCK --> D_AMEN
+    DUCK --> D_DATE
+    FACT --> PARTS
+    FACT --> ML_MODELS
+    DOCS --> CHROMA
+    FACT --> CHROMA
+    CHROMA --> MMR
+    ML_MODELS --> STREAMLIT
+    MMR --> STREAMLIT
+    DUCK --> STREAMLIT
+    DUCK --> BI
 ```
 
 ---
 
-## Kimball Star Schema Design
+## 2. Active Technical Stack
 
-```mermaid
-erDiagram
-    DIM_DATE ||--o{ FACT_PROPERTY_LISTINGS : "records date"
-    DIM_LOCATION ||--o{ FACT_PROPERTY_LISTINGS : "located at"
-    DIM_PROPERTY_TYPE ||--o{ FACT_PROPERTY_LISTINGS : "configured as"
-    DIM_AMENITIES ||--o{ FACT_PROPERTY_LISTINGS : "features"
-
-    FACT_PROPERTY_LISTINGS {
-        string listing_id PK
-        int date_key FK
-        string location_key FK
-        string property_type_key FK
-        string amenity_key FK
-        string city "Partition Key"
-        string year_month "Partition Key"
-        bigint price_inr "Measure"
-        int rent_inr "Measure"
-        float carpet_area_sqft "Measure"
-        float price_per_sqft "Derived Measure"
-        float rental_yield_pct "Derived Measure"
-        int bathrooms
-        int balconies
-        int days_on_market
-    }
-
-    DIM_DATE {
-        int date_key PK
-        date full_date
-        int month
-        string month_name
-        int quarter
-        int year
-        int is_weekend
-    }
-
-    DIM_LOCATION {
-        string location_key PK
-        string city
-        string locality
-        int transit_score
-        int safety_score
-        int school_score
-        float metro_distance_km
-        int hospital_count
-    }
-
-    DIM_PROPERTY_TYPE {
-        string property_type_key PK
-        int bhk_count
-        string bhk_label
-        string property_category
-        string furnishing_status
-    }
-
-    DIM_AMENITIES {
-        string amenity_key PK
-        int has_parking
-        int has_gym
-        int has_swimming_pool
-        int has_clubhouse
-        int has_security
-        int has_power_backup
-        string amenity_tier
-    }
-```
+| Tier | Component | Technology & Version | Role in Platform |
+| :--- | :--- | :--- | :--- |
+| **OLTP Database** | PostgreSQL | PostgreSQL 16.8 (Port 5432) | Stores raw landing tables (`raw_property_listings`, `raw_locality_infrastructure`, `raw_scraped_documents`) via SQLAlchemy. |
+| **OLAP Warehouse** | DuckDB | DuckDB 1.1.3 (Columnar Engine) | Embedded analytical star schema warehouse executing vectorized SQL queries with zero network latency. |
+| **Cloud Warehouse** | Snowflake | Snowflake Data Cloud | Cloud star schema with automated DDL provisioning and high-speed `write_pandas` Parquet loading. |
+| **Data Quality** | Great Expectations | Great Expectations 1.24.0 | Continuous data contract validation (null prices, area bounds, sensible ranges, uniqueness) with automated pipeline halting. |
+| **Vector Store** | ChromaDB | ChromaDB 1.5.9 | Vector store hosting 357 chunked listing descriptions, statutory lease agreements, and locality reviews. |
+| **Embedding Model** | all-MiniLM-L6-v2 | Native ONNX Runtime | 384-dimensional dense semantic vectors executed directly on CPU without PyTorch accelerator overhead. |
+| **Machine Learning** | Scikit-Learn & XGBoost | Scikit-Learn 1.4.2, XGBoost 2.0.3 | Decision Forest, k-NN, Naive Bayes (binned target expected value), SVM (SVR RBF), and XGBoost with 95% bootstrap CI. |
+| **Dashboard UI** | Streamlit | Streamlit 1.43, Plotly 5.20 | Dark fintech investment terminal theme (`#111214` background, `#1E1F23` cards, `#B4F73E` accents, zero emojis/stickers). |
+| **Containerization** | Docker | Docker Engine 24+, Compose v2 | Multi-stage production container with healthcheck-driven service orchestration. |
 
 ---
 
-## ML Model Benchmark (Price & Rent Forecasting)
+## 3. Real Measured Benchmark Metrics
 
-Evaluated on 1,594 deduplicated real estate properties across Delhi NCR and Bangalore:
-
-| Model Algorithm | $R^2$ Score | RMSE (INR) | MAE (INR) | MAPE (%) | Inference Latency |
-| :--- | :---: | :---: | :---: | :---: | :---: |
-| **XGBoost Regressor** | **0.9681** | **INR 1,680,942** | **INR 1,145,717** | **7.51%** | **0.009 ms** |
-| **Decision Forest (Random Forest)** | **0.9641** | **INR 1,784,105** | **INR 1,218,528** | **7.92%** | **0.088 ms** |
-| **k-Nearest Neighbors (k-NN)** | 0.9401 | INR 2,303,067 | INR 1,482,275 | 9.72% | 0.012 ms |
-| **Ridge Linear Regression** | 0.8652 | INR 3,454,372 | INR 2,402,554 | 20.98% | 0.001 ms |
-
----
-
-## Dual-Engine GenAI Research Copilot
-
-PropIQ features a production dual-mode GenAI Copilot combining **Vector Document RAG (ChromaDB)** and **Structured Text-to-SQL (DuckDB / Snowflake)**:
-
-### Mode 1: Semantic Document RAG (ChromaDB + all-MiniLM-L6-v2 + MMR)
-- **Vector Store**: Persistent ChromaDB (`data/warehouse/chroma_db`) indexed with `all-MiniLM-L6-v2` embeddings.
-- **Embedded Knowledge**: Verified property listings (descriptions, pricing, amenities, yields), statutory residential lease agreements (NCR & Bangalore models), and locality infrastructure reports.
-- **Maximal Marginal Relevance (MMR)**: Balances semantic relevance and document diversity:
-  $$\text{MMR} = \arg\max_{d_i \in R \setminus S} \left[ \lambda \cdot \text{Sim}(d_i, q) - (1 - \lambda) \max_{d_j \in S} \text{Sim}(d_i, d_j) \right]$$
-  Adjustable $\lambda$ parameter ($0.1$ to $1.0$) prevents redundancy in retrieved context.
-- **Metadata Filtering**: Exact filtering by `city` (Noida, Gurgaon, Delhi, Bangalore, Greater Noida) and `locality` (e.g., Sector 137, Indiranagar).
-- **Source Document Transparency**: Every synthesized answer renders ranked source cards showing document title, category badge, city, locality, MMR similarity score, and excerpt.
-
-### Mode 2: Structured Star Schema Text-to-SQL
-Translates complex natural language queries into executable SQL over Kimball fact and dimension tables on DuckDB or Snowflake:
-```sql
-SELECT f.city, l.locality, p.bhk_label,
-       ROUND(AVG(f.price_inr), 0) as avg_price,
-       ROUND(AVG(f.rent_inr), 0) as avg_rent,
-       ROUND(AVG(f.rental_yield_pct), 2) as avg_rental_yield_pct
-FROM fact_property_listings f
-JOIN dim_location l ON f.location_key = l.location_key
-JOIN dim_property_type p ON f.property_type_key = p.property_type_key
-WHERE f.city = 'Noida' AND p.bhk_count = 2
-GROUP BY f.city, l.locality, p.bhk_label
-ORDER BY avg_rental_yield_pct DESC LIMIT 5;
-```
+### A. Data Ingestion, Deduplication & Quality Validation
+| Metric Category | Measured Value | Implementation & Verification Method |
+| :--- | :--- | :--- |
+| **Raw Listings Ingested** | **1,850 rows** | Extracted from Portal Alpha CSV (1,000) and Portal Beta messy CSV (850). Stored in PostgreSQL `raw_property_listings`. |
+| **Duplicates Detected & Merged** | **256 pairs** | Spatial-attribute blocking with Haversine distance $< 75\text{m}$ and price/area variance $\le \pm 5\%$. Recorded in `deduplication_audit.csv`. |
+| **Canonical Unique Properties** | **1,594 records** | Cleaned golden master records loaded into DuckDB `fact_property_listings`. |
+| **Great Expectations Assertions** | **8 / 8 Passed (100.0%)** | Validated: 0 null prices, 0 non-positive areas, 0 out-of-range prices/rents, 0 duplicate IDs. Circuit breaker verified. |
+| **Vector Documents Indexed** | **357 documents** | 300 deduplicated listings, 33 statutory lease agreement clauses, 24 locality dossiers embedded in ChromaDB. |
 
 ---
 
-## Snowflake Cloud Data Warehouse Setup
+### B. Physical Partition Pruning Performance
+Analytical aggregate query executed against full dataset versus physical partition:
+$$\text{Query: SELECT city, COUNT(*), AVG(price), AVG(rent), AVG(yield) WHERE city = 'Noida' GROUP BY city}$$
 
-PropIQ provides dual OLAP warehouse support: **DuckDB** (embedded columnar execution for zero-latency local development) and **Snowflake** (production cloud data warehouse).
+| Storage Layout | Scan Execution Time | Storage Scan Volume | Speedup Factor |
+| :--- | :--- | :--- | :--- |
+| **Unpartitioned Parquet Scan** | **2.36 ms** | 1,594 rows (100% full file scan) | 1.00x (Baseline) |
+| **Physical City Partition (`city=Noida`)** | **1.20 ms** | 344 rows (78.4% partition pruned) | **1.97x faster** |
 
-### 1. Configure Credentials
-Set your credentials in `config/config.yaml` or export environment variables:
+---
+
+### C. Machine Learning Model Comparison (80/20 Train/Test Split)
+Evaluated on a held-out 20% test partition ($n = 319$). 95% confidence intervals computed over $B = 1,000$ empirical bootstrap resamples:
+
+#### Target 1: Property Acquisition Price (INR)
+| Model Architecture | Test MAE (INR) | 95% Bootstrap Error CI | Error Margin | $R^2$ Score | 95% $R^2$ CI | Inference Latency |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **SVM (SVR RBF Kernel)** | **INR 1,140,176** | `[1,012,906 - 1,282,922]` | $\pm$ INR 135,008 | **0.9689** | `[0.9587 - 0.9765]` | 0.038 ms/sample |
+| **XGBoost Regressor** | **INR 1,145,717** | `[1,017,801 - 1,284,715]` | $\pm$ INR 133,457 | **0.9681** | `[0.9595 - 0.9744]` | 0.004 ms/sample |
+| **Decision Forest (Random Forest)** | **INR 1,218,528** | `[1,074,073 - 1,358,470]` | $\pm$ INR 142,198 | **0.9641** | `[0.9545 - 0.9711]` | 0.084 ms/sample |
+| **k-NN Regressor ($k=7$)** | **INR 1,482,275** | `[1,307,236 - 1,686,894]` | $\pm$ INR 189,829 | **0.9401** | `[0.9121 - 0.9583]` | 0.006 ms/sample |
+| **Naive Bayes (Binned Expected Value)**| **INR 2,597,774** | `[2,314,489 - 2,894,932]` | $\pm$ INR 290,221 | **0.8439** | `[0.8118 - 0.8677]` | 0.002 ms/sample |
+
+#### Target 2: Monthly Rent Valuation (INR/mo)
+| Model Architecture | Test MAE (INR) | 95% Bootstrap Error CI | Error Margin | $R^2$ Score | 95% $R^2$ CI | Inference Latency |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **SVM (SVR RBF Kernel)** | **INR 4,144** | `[3,706 - 4,658]` | $\pm$ INR 476 | **0.9566** | `[0.9431 - 0.9670]` | 0.047 ms/sample |
+| **XGBoost Regressor** | **INR 4,199** | `[3,686 - 4,727]` | $\pm$ INR 520 | **0.9503** | `[0.9342 - 0.9640]` | 0.005 ms/sample |
+| **Decision Forest (Random Forest)** | **INR 4,319** | `[3,859 - 4,816]` | $\pm$ INR 478 | **0.9528** | `[0.9378 - 0.9652]` | 0.087 ms/sample |
+| **k-NN Regressor ($k=7$)** | **INR 5,252** | `[4,679 - 5,935]` | $\pm$ INR 628 | **0.9233** | `[0.8972 - 0.9435]` | 0.006 ms/sample |
+| **Naive Bayes (Binned Expected Value)**| **INR 9,984** | `[9,131 - 10,871]` | $\pm$ INR 870 | **0.7904** | `[0.7330 - 0.8301]` | 0.002 ms/sample |
+
+---
+
+## 4. Setup & Execution Guide
+
+### Option 1: One-Command Launch via Docker Compose (Recommended)
+Launches the PostgreSQL 16 database and the Streamlit web application together with internal healthcheck coordination:
+
 ```bash
-export SNOWFLAKE_ACCOUNT="your_account_identifier"  # e.g. "xy12345.ap-south-1" or "ORG-ACCOUNT"
-export SNOWFLAKE_USER="your_username"
-export SNOWFLAKE_PASSWORD="your_password"
-export SNOWFLAKE_ROLE="ACCOUNTADMIN"
-```
+# 1. Clone repository
+git clone https://github.com/propiq/propiq-platform.git
+cd propiq-platform
 
-### 2. Automated Provisioning & Data Loading
-Execute the standalone automated Snowflake loader:
-```bash
-python src/warehouse/snowflake_loader.py
-```
-This utility:
-- Provisions Virtual Warehouse `PROPIQ_WH` (Size: XSMALL, auto-suspend 60s)
-- Creates Database `PROPIQ_DW` and Schema `CORE_STAR_SCHEMA`
-- Executes table DDL from `src/warehouse/ddl_snowflake.sql` (`DIM_DATE`, `DIM_LOCATION`, `DIM_PROPERTY_TYPE`, `DIM_AMENITIES`, clustered `FACT_PROPERTY_LISTINGS`)
-- Bulk uploads local Parquet marts using Snowflake's high-speed `write_pandas` engine
-- Runs verification queries and logs row counts
+# 2. Launch multi-container environment
+docker compose up --build -d
 
-### 3. Streamlit Cloud DW Workbench
-You can also configure credentials, trigger the bulk loader, and execute live queries against your Snowflake trial account directly from the **Star Schema & DW -> Cloud Data Warehouse (Snowflake)** tab in the dashboard.
+# 3. Access the platform
+# Streamlit Dashboard: http://localhost:8501
+# PostgreSQL Database: localhost:5432 (propiq_db / postgres / postgrespassword)
+```
 
 ---
 
-## Quickstart Guide
+### Option 2: Local Python Environment
 
-### 1. Clone & Install Dependencies
+#### 1. Clone & Install Dependencies
 ```bash
 git clone https://github.com/propiq/propiq-platform.git
 cd propiq-platform
+python -m venv venv
+# Windows:
+.\venv\Scripts\activate
+# Linux/macOS:
+source venv/bin/activate
+
 pip install -r requirements.txt
 ```
 
-### 2. Run the End-to-End Master Pipeline
+#### 2. Start PostgreSQL Database
+Ensure a local PostgreSQL instance is running on port 5432 with database `propiq_db` and user `postgres`:
+```bash
+# Using the bundled Windows runner:
+python scripts/setup_postgres.py
+
+# Or via Docker:
+docker run -d --name propiq_postgres -e POSTGRES_PASSWORD=postgrespassword -e POSTGRES_DB=propiq_db -p 5432:5432 postgres:16-alpine
+```
+
+#### 3. Execute End-to-End Master Pipeline
 ```bash
 python run_pipeline.py
 ```
-This automatically runs data ingestion, spatial deduplication, star schema warehouse transformation, partition benchmarks, and ML model training!
+This single command executes:
+1. Ingestion of raw CSVs, API records, and scraped text into PostgreSQL OLTP tables.
+2. Spatial Haversine deduplication merging 256 duplicate pairs into 1,594 golden records.
+3. Great Expectations data quality validation with automated circuit breaking.
+4. Kimball Star Schema transformation into DuckDB (`propiq_warehouse.duckdb`).
+5. Physical Hive-style partitioning and partition pruning benchmark.
+6. Multi-model training for Price and Rent across Decision Forest, k-NN, Naive Bayes, SVM, and XGBoost.
+7. Automated vector indexing of 357 documents into ChromaDB.
 
-### 3. Launch the Interactive Web Dashboard
+#### 4. Run the Test Suite
+```bash
+pytest
+```
+*Executes all 22 automated tests across deduplication, ingestion, quality checks, star schema, RAG, and ML models.*
+
+#### 5. Launch the Streamlit Dashboard
 ```bash
 streamlit run src/ui/app.py
 ```
-Open your browser at `http://localhost:8501`.
+Access the application at [http://localhost:8501](http://localhost:8501).
 
 ---
 
-## Docker & Cloud Deployment
+## 5. Cloud Deployment to AWS & GCP
 
-For the complete, step-by-step production deployment manual, refer to [DEPLOYMENT.md](docs/DEPLOYMENT.md).
+Complete deployment manifests and step-by-step guides are documented in [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
 
-### 1. One-Command Local Launch with Docker Compose
-Launch both the **PostgreSQL 16 OLTP Database** and the **PropIQ Streamlit Web Platform** with automatic healthcheck dependency handling:
-```bash
-docker compose up --build -d
+- **Amazon Web Services (AWS)**:
+  - Production Serverless: Amazon ECS Fargate + Amazon RDS PostgreSQL + Application Load Balancer ([`deploy/aws/ecs-task-definition.json`](deploy/aws/ecs-task-definition.json))
+  - Single-Instance VM: EC2 / Lightsail User-Data provisioning ([`deploy/aws/ec2-userdata.sh`](deploy/aws/ec2-userdata.sh))
+  - App Runner: [`deploy/aws/app-runner.yaml`](deploy/aws/app-runner.yaml)
+- **Google Cloud Platform (GCP)**:
+  - Serverless Container: Google Cloud Run + Cloud SQL PostgreSQL ([`deploy/gcp/deploy_cloud_run.sh`](deploy/gcp/deploy_cloud_run.sh))
+  - Continuous Integration: Google Cloud Build configuration ([`deploy/gcp/cloudbuild.yaml`](deploy/gcp/cloudbuild.yaml))
+
+---
+
+## 6. Project Directory Structure
+
 ```
-Access the application at [http://localhost:8501](http://localhost:8501) and PostgreSQL at `localhost:5432`.
-
-### 2. AWS Cloud Deployment (ECS Fargate / EC2)
-- Production Fargate Task Definition: [`deploy/aws/ecs-task-definition.json`](deploy/aws/ecs-task-definition.json)
-- EC2 / Lightsail Automated Setup: [`deploy/aws/ec2-userdata.sh`](deploy/aws/ec2-userdata.sh)
-- App Runner Configuration: [`deploy/aws/app-runner.yaml`](deploy/aws/app-runner.yaml)
-
-### 3. GCP Cloud Deployment (Cloud Run / Cloud SQL)
-- Automated Deployment Script: [`deploy/gcp/deploy_cloud_run.sh`](deploy/gcp/deploy_cloud_run.sh)
-- Google Cloud Build Pipeline: [`deploy/gcp/cloudbuild.yaml`](deploy/gcp/cloudbuild.yaml)
-
----
-
-## BI & Data Exports
-Star schema marts are exported to `data/warehouse/export_powerbi/`. Copy the ready-made DAX measures from `power_bi/dax_measures.txt` for instantaneous reporting in Power BI Desktop!
-
+PropIQ/
+├── Dockerfile                             # Multi-stage production Dockerfile
+├── docker-compose.yml                     # Root one-command multi-container compose
+├── requirements.txt                       # Locked production dependencies
+├── run_pipeline.py                        # Master end-to-end pipeline orchestrator
+├── config/
+│   └── config.yaml                        # Ingestion, database, and Snowflake configs
+├── deploy/                                # Cloud deployment manifests
+│   ├── aws/                               # AWS ECS Fargate, App Runner, EC2 configs
+│   └── gcp/                               # GCP Cloud Run deployment script & Cloud Build
+├── docs/
+│   └── DEPLOYMENT.md                      # Comprehensive production cloud deployment manual
+├── src/
+│   ├── ingestion/                         # Multi-source ingestion (CSV, API, Scraper, Pipeline Runner)
+│   ├── cleaning/                          # Haversine deduplication & Great Expectations data quality
+│   ├── warehouse/                         # Kimball star schema ETL, DuckDB loader, Snowflake manager, partitioning
+│   ├── ml/                                # Feature engineering, model definitions, training & inference
+│   ├── rag/                               # ChromaDB vector store, MMR retrieval, and Gemini Assistant
+│   └── ui/                                # Streamlit dark fintech analytics platform (app.py)
+├── data/
+│   ├── raw/                               # Portal Alpha/Beta CSVs, mock APIs, and scraped texts
+│   ├── staging/                           # Deduplicated Parquet and audit trails
+│   └── warehouse/                         # DuckDB warehouse, ChromaDB vector store, partitioned Parquets
+├── artifacts/
+│   ├── ml/                                # Trained models bundle (.joblib) and metrics JSON
+│   └── quality/                           # Great Expectations validation report JSON
+└── tests/                                 # 22-test automated test suite (pytest)
+```
